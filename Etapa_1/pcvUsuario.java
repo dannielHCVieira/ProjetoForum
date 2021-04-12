@@ -7,22 +7,22 @@
 import java.io.*;
 
 public class pcvUsuario implements RegistroHashExtensivel<pcvUsuario> {
-    private Integer id;
-    private long endereco;
+    private Integer chave;
+    private long valor;
     private short TAMANHO = 20;
 
     public pcvUsuario(){
         this(-1,-1);
     }
 
-    public pcvUsuario(int id, long endereco){
-        this.id = id;
-        this.endereco = endereco; 
+    public pcvUsuario(int chave, long valor){
+        this.chave = chave;
+        this.valor = valor; 
     }
 
     @Override
     public int hashCode() {
-        return this.id.hashCode();
+        return this.chave.hashCode();
     }
 
     @Override
@@ -34,8 +34,8 @@ public class pcvUsuario implements RegistroHashExtensivel<pcvUsuario> {
     public byte[] toByteArray() throws IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         DataOutputStream dos = new DataOutputStream(baos);
-        dos.writeInt(this.id);
-        dos.writeLong(this.endereco);
+        dos.writeInt(this.chave);
+        dos.writeLong(this.valor);
 
         byte[] ba = baos.toByteArray();
         byte[] ba2 = new byte[TAMANHO];
@@ -52,24 +52,24 @@ public class pcvUsuario implements RegistroHashExtensivel<pcvUsuario> {
     public void fromByteArray(byte[] ba) throws IOException {
         ByteArrayInputStream bais = new ByteArrayInputStream(ba);
         DataInputStream dis = new DataInputStream(bais);
-        this.id = dis.readInt();
-        this.endereco = dis.readLong();
+        this.chave = dis.readInt();
+        this.valor = dis.readLong();
     }
 
-    public Integer getId() {
-        return id;
+    public Integer getChave() {
+        return chave;
     }
 
-    public void setId(Integer id) {
-        this.id = id;
+    public void setChave(Integer chave) {
+        this.chave = chave;
     }
 
-    public long getEndereco() {
-        return endereco;
+    public long getValor() {
+        return valor;
     }
 
-    public void setEndereco(long endereco) {
-        this.endereco = endereco;
+    public void setValor(long valor) {
+        this.valor = valor;
     }
     
 }

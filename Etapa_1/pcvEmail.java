@@ -59,20 +59,20 @@ public class pcvEmail implements RegistroHashExtensivel<pcvEmail> {
         this.valor = dis.readInt();
     }
 
-    public Integer getId() {
-        return id;
+    public String getChave() {
+        return chave;
     }
 
-    public void setId(Integer id) {
-        this.id = id;
+    public void setChave(String chave) {
+        this.chave = chave;
     }
 
-    public long getEndereco() {
-        return endereco;
+    public int getValor() {
+        return valor;
     }
 
-    public void setEndereco(long endereco) {
-        this.endereco = endereco;
+    public void setValor(int valor) {
+        this.valor = valor;
     }
-    
+
 }

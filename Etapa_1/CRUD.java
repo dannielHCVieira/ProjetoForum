@@ -2,12 +2,15 @@ import java.io.*;
 import java.lang.reflect.Constructor;
 
 
-public class CRUD<T extends Registro> {
+public class CRUD<T extends Registro, T2 extends RegistroHashExtensivel<T2>,
+                  T3 extends RegistroHashExtensivel<T3>> {
 
     private RandomAccessFile raf;
     private Constructor<T> construtor;
-    private HashExtensivel<pcvUsuario> hash;
-    private HashExtensivel<pcvEmail> hash2;
+    private HashExtensivel<pcvUsuario> hash; //private Constructor<T2> construtorHash;
+    private HashExtensivel<pcvEmail> hash2;  //private Constructor<T3> construtorHashEmail;
+    //private HashExtensivel<T2> hash;
+    //private HashExtensivel<T3> hash2;
     private String fileString;
 
     public CRUD(Constructor<T> construtor, String fileString) throws Exception 
@@ -17,6 +20,20 @@ public class CRUD<T extends Registro> {
         this.hash = new HashExtensivel<>(pcvUsuario.class.getConstructor(), 4, "dados/usuario.hash_d.db", "dados/usuario.hash_c.db");
         this.hash2 = new HashExtensivel<>(pcvEmail.class.getConstructor(), 4, "dados/email.hash_d.db", "dados/email.hash_c.db");
     }
+
+    /**
+     * 
+    public CRUD(Constructor<T> construtor, Constructor<T2> construtorHash, 
+                Constructor<T3> construtorHashEmail, String fileString) throws Exception 
+    {
+        this.construtor = construtor;
+        this.construtorHash = construtorHash;
+        this.construtorHashEmail = construtorHashEmail;
+        this.fileString = fileString;
+        this.hash = new HashExtensivel<>(this.construtorHash, 4, "dados/usuario.hash_d.db", "dados/usuario.hash_c.db");
+        this.hash2 = new HashExtensivel<>(this.construtorHashEmail, 4, "dados/email.hash_d.db", "dados/email.hash_c.db");
+    }
+     */
 
     public void openFile() throws IOException {
         raf = new RandomAccessFile(this.fileString, "rw");
@@ -58,8 +75,13 @@ public class CRUD<T extends Registro> {
         //Cria o indice na hash
         pcvUsuario pcvuser = new pcvUsuario(object.getId(), endereco);
         hash.create(pcvuser);
-        pcvEmail pcvemail = new pcvEmail(object.getEmail(), endereco);
+        pcvEmail pcvemail = new pcvEmail(object.getEmail(), object.getId());
         hash2.create(pcvemail);
+
+        /**
+         * hash.create(construtorHash.newInstance(object.getId(), endereco));
+         * hash2.create(construtorHashEmail.newInstance(object.getEmail(), object.getId()));
+         */
 
         closeFile();
         return object.getId();
@@ -298,7 +320,7 @@ public class CRUD<T extends Registro> {
                     
                     //Deleta o indice no hash e hash2.
                     resp = hash.delete(id);
-                    hhash2.delete(objeto.getEmail().hashCode());
+                    hash2.delete(objeto.getEmail().hashCode());
                 }
             }
         }
