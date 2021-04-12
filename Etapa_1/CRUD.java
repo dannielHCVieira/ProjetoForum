@@ -2,8 +2,8 @@ import java.io.*;
 import java.lang.reflect.Constructor;
 
 
-public class CRUD<T extends Registro, T2 extends RegistroHashExtensivel<T4,T5>,
-                  T3 extends RegistroHashExtensivel<T6,T4>> {
+public class CRUD<T extends Registro, T2 extends RegistroHashExtensivel<T2>,
+                  T3 extends RegistroHashExtensivel<T3>> {
 
     private RandomAccessFile raf;
     private Constructor<T> construtor;
@@ -112,14 +112,12 @@ public class CRUD<T extends Registro, T2 extends RegistroHashExtensivel<T4,T5>,
 
             openFile();
 
-            pcv.
-
             //Caso o endereço exista e seja diferente de -1, prosseguir.
-            if(pcv != null && pcv.getValor() != -1){
+            if(pcv != null && !pcv.getValorLong().equals(-1)){
                 objeto = this.construtor.newInstance();
 
                 //Pular no arquivo para o endereço salvo no indice.
-                raf.seek(pcv.getValor()); 
+                raf.seek(pcv.getValorLong()); 
             
                 //Lê-se a lápide.
                 isDeleted = raf.readBoolean();
@@ -170,14 +168,14 @@ public class CRUD<T extends Registro, T2 extends RegistroHashExtensivel<T4,T5>,
             openFile();
 
             //Caso o endereço exista e seja diferente de -1, prosseguir.
-            if(pcv != null && pcv.getValor() != -1){
-                T2 pcv2 = hash.read(pcv.getValor());
-                if(pcv2 != null && pcv2.getValor() != -1)
+            if(pcv != null && !pcv.getValorInt().equals(-1)){
+                T2 pcv2 = hash.read(pcv.getValorInt());
+                if(pcv2 != null && !pcv2.getValorLong().equals(-1))
                 {
                     objeto = this.construtor.newInstance();
 
                     //Pular no arquivo para o endereço salvo no indice.
-                    raf.seek(pcv.getValor()); 
+                    raf.seek(pcv2.getValorLong()); 
                 
                     //Lê-se a lápide.
                     isDeleted = raf.readBoolean();

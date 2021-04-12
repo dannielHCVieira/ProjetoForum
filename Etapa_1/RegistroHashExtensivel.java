@@ -10,7 +10,7 @@ v1.1 - 2021
 */
 import java.io.IOException;
 
-public interface RegistroHashExtensivel<T,T2> {
+public interface RegistroHashExtensivel<T> {
 
   public int hashCode(); // chave numérica para ser usada no diretório
 
@@ -20,7 +20,7 @@ public interface RegistroHashExtensivel<T,T2> {
 
   public void fromByteArray(byte[] ba) throws IOException; // vetor de bytes a ser usado na construção do elemento
 
-  public T getChave();
+  public Integer getValorInt();
 
-  public T2 getValor();
+  public Long getValorLong();
 }

@@ -15,6 +15,8 @@ public class Main {
       pcvEmail.class.getDeclaredConstructor(String.class,int.class),
       pcvEmail.class.getConstructor(),"dados/usuarios.db");
 
+      System.out.println("AAA00");
+
       int opmenu = -1;
       Scanner sc = new Scanner(System.in);
       while (opmenu != 0 && (opmenu < 0 || opmenu > 2))
