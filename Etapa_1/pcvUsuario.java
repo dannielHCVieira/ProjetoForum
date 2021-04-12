@@ -6,7 +6,7 @@
 
 import java.io.*;
 
-public class pcvUsuario implements RegistroHashExtensivel<pcvUsuario> {
+public class pcvUsuario implements RegistroHashExtensivel<Integer,Long> {
     private Integer chave;
     private long valor;
     private short TAMANHO = 20;
@@ -64,7 +64,7 @@ public class pcvUsuario implements RegistroHashExtensivel<pcvUsuario> {
         this.chave = chave;
     }
 
-    public long getValor() {
+    public Long getValor() {
         return valor;
     }
 

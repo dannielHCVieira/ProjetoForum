@@ -2,15 +2,17 @@ import java.io.*;
 import java.lang.reflect.Constructor;
 
 
-public class CRUD<T extends Registro, T2 extends RegistroHashExtensivel<T2>,
-                  T3 extends RegistroHashExtensivel<T3>> {
+public class CRUD<T extends Registro, T2 extends RegistroHashExtensivel<T4,T5>,
+                  T3 extends RegistroHashExtensivel<T6,T4>> {
 
     private RandomAccessFile raf;
     private Constructor<T> construtor;
    /*  private HashExtensivel<pcvUsuario> hash; 
     private HashExtensivel<pcvEmail> hash2;  */
-    private Constructor<T2> construtorHash;
-    private Constructor<T3> construtorHashEmail;
+    private Constructor<T2> construtorHashWithParams;
+    private Constructor<T2> construtorHashWithoutParams;
+    private Constructor<T3> construtorHashEmailWithParams;
+    private Constructor<T3> construtorHashEmailWithoutParams;
     private HashExtensivel<T2> hash;
     private HashExtensivel<T3> hash2;
     private String fileString;
@@ -23,15 +25,18 @@ public class CRUD<T extends Registro, T2 extends RegistroHashExtensivel<T2>,
         this.hash2 = new HashExtensivel<>(pcvEmail.class.getConstructor(), 4, "dados/email.hash_d.db", "dados/email.hash_c.db");
     } */
 
-    public CRUD(Constructor<T> construtor, Constructor<T2> construtorHash, 
-                Constructor<T3> construtorHashEmail, String fileString) throws Exception 
+    public CRUD(Constructor<T> construtor, Constructor<T2> construtorHashWithParams, 
+                Constructor<T2> construtorHashWithoutParams,Constructor<T3> construtorHashEmailWithParams, 
+                Constructor<T3> construtorHashEmailWithoutParams,String fileString) throws Exception 
     {
         this.construtor = construtor;
-        this.construtorHash = construtorHash;
-        this.construtorHashEmail = construtorHashEmail;
+        this.construtorHashWithParams = construtorHashWithParams;
+        this.construtorHashWithoutParams = construtorHashWithoutParams;
+        this.construtorHashEmailWithParams = construtorHashEmailWithParams;
+        this.construtorHashEmailWithoutParams = construtorHashEmailWithoutParams;
         this.fileString = fileString;
-        this.hash = new HashExtensivel<>(this.construtorHash, 4, "dados/usuario.hash_d.db", "dados/usuario.hash_c.db");
-        this.hash2 = new HashExtensivel<>(this.construtorHashEmail, 4, "dados/email.hash_d.db", "dados/email.hash_c.db");
+        this.hash = new HashExtensivel<>(this.construtorHashWithoutParams, 4, "dados/usuario.hash_d.db", "dados/usuario.hash_c.db");
+        this.hash2 = new HashExtensivel<>(this.construtorHashEmailWithoutParams, 4, "dados/email.hash_d.db", "dados/email.hash_c.db");
     }
     
 
@@ -79,8 +84,8 @@ public class CRUD<T extends Registro, T2 extends RegistroHashExtensivel<T2>,
         hash2.create(pcvemail) */;
 
         
-        hash.create(construtorHash.newInstance(object.getId(), endereco));
-        hash2.create(construtorHashEmail.newInstance(object.getEmail(), object.getId()));
+        hash.create(construtorHashWithParams.newInstance(object.getId(), endereco));
+        hash2.create(construtorHashEmailWithParams.newInstance(object.getEmail(), object.getId()));
         
 
         closeFile();
@@ -106,6 +111,8 @@ public class CRUD<T extends Registro, T2 extends RegistroHashExtensivel<T2>,
             T2 pcv = hash.read(Integer.valueOf(id).hashCode());
 
             openFile();
+
+            pcv.
 
             //Caso o endereço exista e seja diferente de -1, prosseguir.
             if(pcv != null && pcv.getValor() != -1){

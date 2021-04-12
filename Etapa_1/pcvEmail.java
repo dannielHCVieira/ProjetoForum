@@ -7,7 +7,7 @@
 
 import java.io.*;
 
-public class pcvEmail implements RegistroHashExtensivel<pcvEmail> {
+public class pcvEmail implements RegistroHashExtensivel<String, Integer> {
     private String chave; // email
     private int    valor; // id 
     private short TAMANHO = 20;
@@ -67,7 +67,7 @@ public class pcvEmail implements RegistroHashExtensivel<pcvEmail> {
         this.chave = chave;
     }
 
-    public int getValor() {
+    public Integer getValor() {
         return valor;
     }
 

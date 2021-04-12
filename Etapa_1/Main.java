@@ -9,7 +9,10 @@ public class Main {
   public static void main(String[] args) 
   {
     try{
-      arqPessoas = new CRUD<>(Usuario.class.getConstructor(), pcvUsuario.class.getConstructor(),
+      arqPessoas = new CRUD<>(Usuario.class.getConstructor(), 
+      pcvUsuario.class.getDeclaredConstructor(int.class,long.class),
+      pcvUsuario.class.getConstructor(), 
+      pcvEmail.class.getDeclaredConstructor(String.class,int.class),
       pcvEmail.class.getConstructor(),"dados/usuarios.db");
 
       int opmenu = -1;

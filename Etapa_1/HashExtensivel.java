@@ -21,7 +21,7 @@ import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import java.lang.reflect.Constructor;
 
-public class HashExtensivel<T extends RegistroHashExtensivel<T>> {
+public class HashExtensivel<T extends RegistroHashExtensivel<T,T2>> {
 
   String nomeArquivoDiretorio;
   String nomeArquivoCestos;
