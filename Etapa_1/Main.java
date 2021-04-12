@@ -8,25 +8,32 @@ public class Main {
 
   public static void main(String[] args) 
   {
-    int opmenu = -1;
-    Scanner sc = new Scanner(System.in);
-    while (opmenu != 0 && (opmenu < 0 || opmenu > 2))
-    {
-      menu();
-      opmenu = sc.nextInt();
-      switch (opmenu)
+    try{
+      arqPessoas = new CRUD<>(Usuario.class.getConstructor(), pcvUsuario.class.getConstructor(),
+      pcvEmail.class.getConstructor(),"dados/usuarios.db");
+
+      int opmenu = -1;
+      Scanner sc = new Scanner(System.in);
+      while (opmenu != 0 && (opmenu < 0 || opmenu > 2))
       {
-        case 1: acessoSistema(sc);
-          break;
-        
-        case 2: novoUsuario(sc);
-          break;
-        
-        default:
-          System.out.println("\n\nValor invalido, digite novamente");
+        menu();
+        opmenu = sc.nextInt();
+        switch (opmenu)
+        {
+          case 1: acessoSistema(sc);
+            break;
+          
+          case 2: novoUsuario(sc);
+            break;
+          
+          default:
+            System.out.println("\n\nValor invalido, digite novamente");
+        }
       }
+      sc.close();
+    }catch(Exception e){
+      e.printStackTrace();
     }
-    sc.close();
   }
 
   public static void menu()
@@ -44,7 +51,7 @@ public class Main {
   {
     try
     {
-      arqPessoas = new CRUD<>(Usuario.class.getConstructor(), "usuarios.db");
+   
       System.out.println("NOVO USUARIO");
       System.out.print("E-mail:");
       //Ler email e verificar se ele está no sistema
@@ -98,7 +105,8 @@ public class Main {
       System.out.println("NOVO USUARIO");
       System.out.print("E-mail:");
       //Ler email e verificar se esse usuario ta cadastrado
-      Usuario user = arqPessoas.read(sc.next()); //pcvEmail pcvEmail = arqPessoas.read(sc.next());
+      String email = sc.next();
+      Usuario user = arqPessoas.read(email); //pcvEmail pcvEmail = arqPessoas.read(sc.next());
       if (user != null) // Verifica se o pcvEmail é valido.
       {
         /**
