@@ -133,7 +133,7 @@ public class Main {
     try
     {
       System.out.println("\n=============");
-      System.out.println("ACESSO AO SISTEMA");
+      System.out.println("NOVO USUARIO");
       System.out.print("E-mail: ");
       //Ler email e verificar se esse usuario ta cadastrado
       String email = sc.nextLine();

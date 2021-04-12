@@ -246,7 +246,7 @@ public class CRUD<T extends Registro, T2 extends RegistroHashExtensivel<T2>,
                         if (novoBa.length <= ba.length) 
                         {
                             raf.seek(pos+5); //Pula os 5 bytes de lapide e tamRegistro, e depois escreve os dados.
-                            raf.write(ba);
+                            raf.write(novoBa);
                         } 
                         else 
                         {
