@@ -160,7 +160,6 @@ public class CRUD<T extends Registro, T2 extends RegistroHashExtensivel<T2>,
         int tam;
         boolean isDeleted;
         try{
-            System.out.println("AAA");
             //Lê-se o hash2 procurando pelo endereco do email.
             //pcvEmail pcv = hash2.read(email.hashCode());
             T3 pcv = hash2.read(email.hashCode());

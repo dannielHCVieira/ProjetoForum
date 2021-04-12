@@ -17,10 +17,11 @@ public class Main {
 
       int opmenu = -1;
       Scanner sc = new Scanner(System.in);
-      while (opmenu != 0 && (opmenu < 0 || opmenu > 2))
+      while (opmenu != 0)
       {
         menu();
         opmenu = sc.nextInt();
+        sc.nextLine();
         switch (opmenu)
         {
           case 1: acessoSistema(sc);
@@ -29,6 +30,10 @@ public class Main {
           case 2: novoUsuario(sc);
             break;
           
+          case 0: 
+            System.out.println("\nFechando sistema...");
+            break;
+
           default:
             System.out.println("\n\nValor invalido, digite novamente");
         }
@@ -41,6 +46,7 @@ public class Main {
 
   public static void menu()
   {
+    System.out.println("\n=============");
     System.out.println("PERGUNTAS 1.0");
     System.out.println("=============");
     System.out.println("\nACESSO\n");
@@ -54,43 +60,49 @@ public class Main {
   {
     try
     {
-   
+      System.out.println("\n=============");
       System.out.println("NOVO USUARIO");
-      System.out.print("E-mail:");
+      System.out.print("E-mail: ");
       //Ler email e verificar se ele está no sistema
-      String email = sc.next();
+      String email = sc.nextLine(), nome, senha;
       if(email.length() == 0){
         System.out.println("Email inválido. Voltando para o menu...");
       }
       else{
-        Usuario user = arqPessoas.read(email); //pcvEmail pcvEmail = arqPessoas.read(email);
-        if (user != null) // Verificar se pcvEmail já foi cadastrado. 
+        Usuario user = arqPessoas.read(email); 
+        if (user != null) 
           System.out.println("Email já cadastrado. Voltando para o menu...");
         else
         {
           //criar um novo usuario no sistema com os dados inseridos
-          user = new Usuario(); //Usuario user = new Usuario();
-          System.out.print("Digite seu nome:");
-          user.setNome(sc.nextLine());
+          user = new Usuario(); 
+          do{
+            System.out.print("Nome: ");
+            nome = sc.nextLine();
+          }while(nome.length() == 0);
 
           do{
-            System.out.print("Digite sua senha:");
-            user.setSenha(sc.nextLine().hashCode());
-            System.out.println("Digite sua senha novamente:");
-          }while(sc.nextLine().hashCode() != user.getSenha());
+            System.out.print("Senha: ");
+            senha = sc.nextLine();
+            System.out.print("Digite sua senha novamente: ");
+          }while(!sc.nextLine().equals(senha) || senha.length() == 0);
           
           System.out.println("\n\nConfirme seus dados:");
           System.out.println("Email: " + email);
-          System.out.println("Nome: " + user.getNome());
-          System.out.println("Senha: " + user.getSenha());
+          System.out.println("Nome: " + nome);
+          System.out.println("Senha: " + senha);
 
-          System.out.print("Confirmar? (Y/S) ");
+          System.out.print("Confirmar? (Y/N) ");
           if(sc.nextLine().toUpperCase().equals("Y")){
+            user.setEmail(email);
+            user.setNome(nome);
+            user.setSenha(senha.hashCode());
+
             arqPessoas.create(user);
-            System.out.println("Usuário cadastrado com sucesso");
+            System.out.println("\nUsuário cadastrado com sucesso\n");
           }
           else{
-            System.out.println("Cadastro de Usuário cancelado.");
+            System.out.println("\nCadastro de Usuário cancelado.\n");
           }
         }
       }
@@ -105,26 +117,24 @@ public class Main {
   {
     try
     {
+      System.out.println("\n=============");
       System.out.println("NOVO USUARIO");
-      System.out.print("E-mail:");
+      System.out.print("E-mail: ");
       //Ler email e verificar se esse usuario ta cadastrado
-      String email = sc.next();
-      Usuario user = arqPessoas.read(email); //pcvEmail pcvEmail = arqPessoas.read(sc.next());
-      if (user != null) // Verifica se o pcvEmail é valido.
+      String email = sc.nextLine();
+      Usuario user = arqPessoas.read(email); 
+      if (user != null) 
       {
-        /**
-         * Usuario user = arqPessoas.read(pcvEmail.getId());
-         */
-        System.out.print("Digite a sua senha:");
+        System.out.print("Senha: ");
         String senha = sc.nextLine();
         if (senha.hashCode() == user.getSenha())
           //rediciona para a tela principal
-          System.out.println("Redirecionando para tela principal");
+          System.out.println("\nRedirecionando para tela principal\n");
         else
-          System.out.println("Senha invalida");
+          System.out.println("\nSenha invalida\n");
       }
       else
-        System.out.println("Email nao cadastrado");
+        System.out.println("\nEmail nao cadastrado\n");
     }
     catch(Exception erro)
     {
