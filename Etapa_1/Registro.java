@@ -7,4 +7,5 @@ public interface Registro {
     public void setEmail(String email);
     public byte[] toByteArray() throws IOException;
     public void fromByteArray(byte[] ba) throws IOException; 
+    public String toString();
 }
