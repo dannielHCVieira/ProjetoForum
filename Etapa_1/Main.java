@@ -13,9 +13,7 @@ public class Main {
       pcvUsuario.class.getDeclaredConstructor(int.class,long.class),
       pcvUsuario.class.getConstructor(), 
       pcvEmail.class.getDeclaredConstructor(String.class,int.class),
-      pcvEmail.class.getConstructor(),"dados/usuarios.db");
-
-      System.out.println("AAA00");
+      pcvEmail.class.getConstructor(),"Etapa_1/dados/usuarios.db");
 
       int opmenu = -1;
       Scanner sc = new Scanner(System.in);

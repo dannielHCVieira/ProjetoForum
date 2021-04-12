@@ -35,8 +35,8 @@ public class CRUD<T extends Registro, T2 extends RegistroHashExtensivel<T2>,
         this.construtorHashEmailWithParams = construtorHashEmailWithParams;
         this.construtorHashEmailWithoutParams = construtorHashEmailWithoutParams;
         this.fileString = fileString;
-        this.hash = new HashExtensivel<>(this.construtorHashWithoutParams, 4, "dados/usuario.hash_d.db", "dados/usuario.hash_c.db");
-        this.hash2 = new HashExtensivel<>(this.construtorHashEmailWithoutParams, 4, "dados/email.hash_d.db", "dados/email.hash_c.db");
+        this.hash = new HashExtensivel<>(this.construtorHashWithoutParams, 4, "Etapa_1/dados/usuario_hash_d.db", "Etapa_1/dados/usuario_hash_c.db");
+        this.hash2 = new HashExtensivel<>(this.construtorHashEmailWithoutParams, 4, "Etapa_1/dados/email_hash_d.db", "Etapa_1/dados/email_hash_c.db");
     }
     
 
