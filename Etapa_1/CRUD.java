@@ -245,9 +245,10 @@ public class CRUD<T extends Registro, T2 extends RegistroHashExtensivel<T2>,
                     {
                         if (novoBa.length <= ba.length) 
                         {
-                            raf.seek(pos); 
-                            createRegistro(novoObjeto);
-                        } 
+                            raf.seek(pos+5); 
+                            //createRegistro(novoObjeto);
+                            raf.write(novoBa);
+                        }
                         else 
                         {
                             //Deleta o registro.
