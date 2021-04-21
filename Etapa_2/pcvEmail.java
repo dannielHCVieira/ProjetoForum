@@ -10,7 +10,7 @@ import java.io.*;
 public class pcvEmail implements RegistroHashExtensivel<pcvEmail> {
     private String chave; // email
     private int    valor; // id 
-    private short TAMANHO = 30;
+    private short TAMANHO = 34;
 
     public pcvEmail(){
         this("",-1);
