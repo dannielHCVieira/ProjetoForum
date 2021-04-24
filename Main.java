@@ -23,20 +23,26 @@ public class Main {
       {
         menuPrincipal();
         opcode = sc.nextInt();
+        sc.nextLine();
         switch (opcode)
         {
-          case 1: opcode = -1;
-            SistemaUsuario(opcode, sc);
+          case 1: acessoSistemaUsuario(sc);
             break;
-          case 2: opcode = -1;
-            SistemaPerguntas(opcode, sc);
+          
+          case 2: novoUsuario(sc);
             break;
-          case 0: System.out.println("\nFechando sistema...");
+
+          case 3: esqueciSenha(sc);
             break;
+          case 0: 
+            System.out.println("\nFechando sistema...");
+            break;
+
           default:
             System.out.println("\n\nValor invalido, digite novamente");
         }
       }
+      sc.close();
     }catch(Exception e){
       e.printStackTrace();
     }
@@ -44,7 +50,7 @@ public class Main {
 
   //---------------------Menus------------------------
 
-  public static void menuUser()
+  public static void menuPrincipal()
   {
     System.out.println("\n=============");
     System.out.println("PERGUNTAS 1.0");
@@ -58,24 +64,12 @@ public class Main {
     System.out.print("Digite sua escolha:");
   }
 
-  public static void menuPrincipal()
-  {
-    System.out.println("\n==================================");
-    System.out.println("Sistema de Perguntas e resposta 1.0");
-    System.out.println("==================================");
-    System.out.println("\nMenu Principal\n");
-    System.out.println("1-Se deseja ir para Usuarios");
-    System.out.println("2-Se deseja ir para Perguntas\n");
-    System.out.println("0-Se deseja sair");
-    System.out.print("Digite a sua escolha:");
-  }
-
   public static void menuPerguntas(int notificacoes)
   {
     System.out.println("\n=============");
     System.out.println("PERGUNTAS 1.0");
     System.out.println("=============");
-    System.out.println("INICIO\n");
+    System.out.println("\nINICIO\n");
     System.out.println("1) Criacao de perguntas");
     System.out.println("2) Consulta/responder perguntas");
     System.out.println("3) Norificacoes: "+notificacoes);
@@ -84,36 +78,6 @@ public class Main {
   }
 
   //-------------------Usuarios-------------------------
-
-  public static void SistemaUsuario(int opcode, Scanner sc)
-  {
-    //menu usuario
-    while (opcode != 0)
-    {
-      menuUser();
-      opcode = sc.nextInt();
-      sc.nextLine();
-      switch (opcode)
-      {
-        case 1: acessoSistemaUsuario(sc);
-          break;
-        
-        case 2: novoUsuario(sc);
-          break;
-
-        case 3: esqueciSenha(sc);
-          break;
-        case 0: 
-          System.out.println("\nFechando sistema...");
-          break;
-
-        default:
-          System.out.println("\n\nValor invalido, digite novamente");
-      }
-    }
-    sc.close();
-  }
-
   public static void novoUsuario(Scanner sc)
   {
     try
@@ -204,7 +168,7 @@ public class Main {
           String senha = sc.nextLine();
           if (senha.hashCode() == user.getSenha())
             //rediciona para a tela principal
-            System.out.println("\nRedirecionando para tela principal\n");
+            sistemaPerguntas(sc);
           else
             System.out.println("\nSenha invalida\n");
         }
@@ -274,8 +238,9 @@ public class Main {
 
   //---------------------------Perguntas------------------------
 
-  public static void SistemaPerguntas(int opcode, Scanner sc)
+  public static void sistemaPerguntas(Scanner sc)
   {
+    int opcode = -1;
     //menu Perguntas
     while (opcode != 0)
     {
@@ -284,7 +249,7 @@ public class Main {
       sc.nextLine();
       switch (opcode)
       {
-        case 1: criacaoPerguntas(opcode,sc);
+        case 1: criacaoPerguntas(sc);
           break;
         
         case 2: System.out.println("Consultar/responder perguntas sera implementado no futuro");
