@@ -10,13 +10,13 @@ public class Usuario implements Registro {
     private String respostaSecreta;
     
     @Override
-    public int getId() {
+    public int getId(){
         return id;
     }
 
     @Override
-    public void setId(int n) {
-        id = n;
+    public void setId(int id) {
+        this.id = id;
     }
 
     @Override
