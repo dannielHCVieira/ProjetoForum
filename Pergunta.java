@@ -1,4 +1,6 @@
-import java.io.DataOutputStream;
+import java.io.*;
+
+import jdk.jshell.spi.ExecutionControl.NotImplementedException;
 
 public class Pergunta implements Registro{
   private int idPergunta;
@@ -79,9 +81,16 @@ public class Pergunta implements Registro{
 
   //NECESSARIO PARA USO NO CRUD
   public String getEmail(){
-
+    return "";
   }
   public void setEmail(String email){
+  }
 
+  public int getId(){
+    return -1;
+  }
+
+  public void setId(int id){
+    
   }
 }

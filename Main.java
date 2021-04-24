@@ -249,7 +249,8 @@ public class Main {
       sc.nextLine();
       switch (opcode)
       {
-        case 1: criacaoPerguntas(sc);
+        case 1: 
+         // criacaoPerguntas(sc);
           break;
         
         case 2: System.out.println("Consultar/responder perguntas sera implementado no futuro");
@@ -265,6 +266,5 @@ public class Main {
           System.out.println("\n\nValor invalido, digite novamente");
       }
     }
-    sc.close();
   }
 }
