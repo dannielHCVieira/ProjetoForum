@@ -14,7 +14,7 @@ public class Main {
       pcvUsuario.class.getDeclaredConstructor(int.class,long.class),
       pcvUsuario.class.getConstructor(), 
       pcvEmail.class.getDeclaredConstructor(String.class,int.class),
-      pcvEmail.class.getConstructor(),"Etapa_2/dados/usuarios.db");
+      pcvEmail.class.getConstructor(),"dados/usuarios.db");
 
       int opcode = -1;
       Scanner sc = new Scanner(System.in);
@@ -85,7 +85,7 @@ public class Main {
 
   //-------------------Usuarios-------------------------
 
-  public static void SistemaUsuario(Int opcode, Scanner sc)
+  public static void SistemaUsuario(int opcode, Scanner sc)
   {
     //menu usuario
     while (opcode != 0)
@@ -279,7 +279,7 @@ public class Main {
     //menu Perguntas
     while (opcode != 0)
     {
-      menuPerguntas();
+      menuPerguntas(0); 
       opcode = sc.nextInt();
       sc.nextLine();
       switch (opcode)
