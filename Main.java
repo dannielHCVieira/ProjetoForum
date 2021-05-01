@@ -1,20 +1,22 @@
 import java.io.*;
 import java.util.Scanner;
 
-public class Main {
+public class Main {//extends RegistroHashExtensivel ?
 
   // Arquivo declarado fora de main() para ser poder ser usado por outros métodos
-  private static CRUD<Usuario, pcvUsuario, pcvEmail> arqPessoas;
+  private static CRUD<Usuario, pcvUsuario> arqPessoas;
+  private static HashExtensivel<pcvEmail> hashEmail;
 
   public static void main(String[] args) 
   {
     try{
       //criacao do crud
-      arqPessoas = new CRUD<>(Usuario.class.getConstructor(), 
+      arqPessoas = new CRUD<>(Usuario.class.getConstructor(),
       pcvUsuario.class.getDeclaredConstructor(int.class,long.class),
       pcvUsuario.class.getConstructor(), 
-      pcvEmail.class.getDeclaredConstructor(String.class,int.class),
-      pcvEmail.class.getConstructor(),"dados/usuarios.db");
+      "dados/usuario_hash_d.db","dados/usuario_hash_c.db","dados/usuarios.db");
+      //criacao hashEmail
+      hashEmail = new HashExtensivel<>(pcvEmail.class.getConstructor(), 4, "dados/email_hash_d.db", "dados/email_hash_c.db");
 
       int opcode = -1;
       Scanner sc = new Scanner(System.in);
@@ -72,7 +74,7 @@ public class Main {
     System.out.println("\nINICIO\n");
     System.out.println("1) Criacao de perguntas");
     System.out.println("2) Consulta/responder perguntas");
-    System.out.println("3) Norificacoes: "+notificacoes);
+    System.out.println("3) Notificacoes: "+notificacoes);
     System.out.println("\n0) Sair\n");
     System.out.print("Opcao:");
   }
@@ -86,20 +88,21 @@ public class Main {
       System.out.println("NOVO USUARIO");
       System.out.print("E-mail: ");
       //Ler email e verificar se ele está no sistema
-      String email = sc.nextLine(), nome, senha, pergunta, resposta;
+      String email = sc.nextLine();
+      String nome, senha, pergunta, resposta;
       if(email.length() == 0)
         System.out.println("Email inválido. Voltando para o menu...");
       else if(email.length() >= 34)
         System.out.println("O email não pode passar de 34 caracteres, atualmente tem "+email.length());
       else
       {
-        Usuario user = arqPessoas.read(email); 
-        if (user != null) 
+        pcvEmail verificacao = hashEmail.read(email.hashCode());
+        if (verificacao != null) 
           System.out.println("Email já cadastrado. Voltando para o menu...");
         else
         {
           //criar um novo usuario no sistema com os dados inseridos
-          user = new Usuario(); 
+          Usuario user = new Usuario(); 
           do{
             System.out.print("Nome: ");
             nome = sc.nextLine();
@@ -112,9 +115,9 @@ public class Main {
           }while(!sc.nextLine().equals(senha) || senha.length() == 0);
 
           do{
-            System.out.println("Digite uma pergunta secreta que sera usada caso esqueça a senha:");
+            System.out.print("\nDigite uma pergunta secreta que sera usada caso esqueça a senha:");
             pergunta = sc.nextLine();
-            System.out.println("Agora a resposta da pergunta:");
+            System.out.print("\nAgora a resposta da pergunta:");
             resposta = sc.nextLine();
           }while(pergunta.length() == 0 && resposta.length() == 0);
           
@@ -134,6 +137,8 @@ public class Main {
             user.setRespostaSecreta(resposta);
 
             arqPessoas.create(user);
+            pcvEmail criacao = new pcvEmail(user.getEmail(), user.getId());
+            hashEmail.create(criacao);
             System.out.println("\nUsuário cadastrado com sucesso\n");
           }
           else{
@@ -154,27 +159,34 @@ public class Main {
     {
       System.out.println("\n=============");
       System.out.println("ACESSO AO SISTEMA");
+      String email = "";
+
+      do
+      {
       System.out.print("E-mail: ");
       //Ler email e verificar se esse usuario ta cadastrado
-      String email = sc.nextLine();
-      if(email.length() >= 34)
-        System.out.println("O email não pode passar de 34 caracteres, atualmente tem "+email.length());
-      else
+      email = sc.nextLine();
+      int tam_email = email.length();
+      if(tam_email >= 34)
+        System.out.println("O email não pode passar de 34 caracteres, atualmente tem "+tam_email);
+      else if(tam_email == 0)
+        System.out.println("Email nao pode contar 0 caracteres");
+      }while(tam_email > 0 && tam_email < 34);
+
+      pcvEmail verificacao = hashEmail.read(email.hashCode());
+      if (verificacao != null) 
       {
-        Usuario user = arqPessoas.read(email); 
-        if (user != null) 
-        {
-          System.out.print("Senha: ");
-          String senha = sc.nextLine();
-          if (senha.hashCode() == user.getSenha())
-            //rediciona para a tela principal
-            sistemaPerguntas(sc);
-          else
-            System.out.println("\nSenha invalida\n");
-        }
+        Usuario user = CRUD.read(verificacao.getValor());
+        System.out.print("Senha: ");
+        String senha = sc.nextLine();
+        if (senha.hashCode() == user.getSenha())
+          //rediciona para a tela principal
+          sistemaPerguntas(sc);
         else
-          System.out.println("\nEmail nao cadastrado\n");
+          System.out.println("\nSenha invalida\n");
       }
+      else
+        System.out.println("\nEmail nao cadastrado\n");
     }
     catch(Exception erro)
     {
@@ -190,25 +202,29 @@ public class Main {
       System.out.println("ESQUECI A SENHA");
       System.out.print("E-mail: ");
       String email = sc.nextLine();
+      pcvEmail verificacao;
 
-      if(email.length() == 0){
+      if(email.length() == 0)
         System.out.println("Email invalido. Voltando para o menu...");
-      }
-      else{
-        Usuario user = arqPessoas.read(email);
+      else
+      {
+        verificacao = hashEmail.read(email.hashCode());
 
-        if(user == null){
+        if(user == null)
           System.out.println("Email não cadastrado. Voltando para o menu...");
-        }
-        else{
+        else
+        {
+          Usuario user = CRUD.read(verificacao.getValor());
           System.out.println("Pergunta Secreta: "+user.getPerguntaSecreta());
           String resposta = sc.nextLine();
           String senha;
 
-          if(!resposta.equals(user.getRespostaSecreta())){
+          if(!resposta.equals(user.getRespostaSecreta()))
             System.out.println("Resposta errada. Voltando para o menu...");
-          }else{
-            do{
+          else
+          {
+            do
+            {
               System.out.print("\nNova senha: ");
               senha = sc.nextLine();
               System.out.print("Digite novamente a nova senha: ");
@@ -217,17 +233,16 @@ public class Main {
             System.out.println("\n\nConfirme seus dados:");
             System.out.println("Senha: " + senha);
             System.out.print("Confirmar? (Y/N) ");
-            if(sc.nextLine().toUpperCase().equals("Y")){
+            if(sc.nextLine().toUpperCase().equals("Y"))
+            {
               user.setSenha(senha.hashCode());
 
               arqPessoas.update(user);
               System.out.println("\nSenha atualizada com sucesso\n");
             }
-            else{
+            else
               System.out.println("\nAtualização de senha cancelada.\n");
-            }
           }
-
         }
       }
     }

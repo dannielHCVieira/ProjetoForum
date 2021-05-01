@@ -2,19 +2,14 @@ import java.io.*;
 import java.lang.reflect.Constructor;
 
 
-public class CRUD<T extends Registro, T2 extends RegistroHashExtensivel<T2>,
-                  T3 extends RegistroHashExtensivel<T3>> {
+public class CRUD<T extends Registro, T2 extends RegistroHashExtensivel<T2>>
+{
 
     private RandomAccessFile raf;
     private Constructor<T> construtor;
-   /*  private HashExtensivel<pcvUsuario> hash; 
-    private HashExtensivel<pcvEmail> hash2;  */
     private Constructor<T2> construtorHashWithParams;
     private Constructor<T2> construtorHashWithoutParams;
-    private Constructor<T3> construtorHashEmailWithParams;
-    private Constructor<T3> construtorHashEmailWithoutParams;
     private HashExtensivel<T2> hash;
-    private HashExtensivel<T3> hash2;
     private String fileString;
 
     /* public CRUD(Constructor<T> construtor, String fileString) throws Exception 
@@ -22,21 +17,16 @@ public class CRUD<T extends Registro, T2 extends RegistroHashExtensivel<T2>,
         this.construtor = construtor;
         this.fileString = fileString;
         this.hash = new HashExtensivel<>(pcvUsuario.class.getConstructor(), 4, "dados/usuario.hash_d.db", "dados/usuario.hash_c.db");
-        this.hash2 = new HashExtensivel<>(pcvEmail.class.getConstructor(), 4, "dados/email.hash_d.db", "dados/email.hash_c.db");
     } */
 
     public CRUD(Constructor<T> construtor, Constructor<T2> construtorHashWithParams, 
-                Constructor<T2> construtorHashWithoutParams,Constructor<T3> construtorHashEmailWithParams, 
-                Constructor<T3> construtorHashEmailWithoutParams,String fileString) throws Exception 
+                Constructor<T2> construtorHashWithoutParam,String db_d, String db_c,String fileString) throws Exception 
     {
         this.construtor = construtor;
         this.construtorHashWithParams = construtorHashWithParams;
         this.construtorHashWithoutParams = construtorHashWithoutParams;
-        this.construtorHashEmailWithParams = construtorHashEmailWithParams;
-        this.construtorHashEmailWithoutParams = construtorHashEmailWithoutParams;
         this.fileString = fileString;
-        this.hash = new HashExtensivel<>(this.construtorHashWithoutParams, 4, "dados/usuario_hash_d.db", "dados/usuario_hash_c.db");
-        this.hash2 = new HashExtensivel<>(this.construtorHashEmailWithoutParams, 4, "dados/email_hash_d.db", "dados/email_hash_c.db");
+        this.hash = new HashExtensivel<>(this.construtorHashWithoutParams, 4, db_d, db_c);
     }
     
 
@@ -77,9 +67,7 @@ public class CRUD<T extends Registro, T2 extends RegistroHashExtensivel<T2>,
         raf.seek(endereco);
         createRegistro(object);
         
-        hash.create(construtorHashWithParams.newInstance(object.getId(), endereco));
-        hash2.create(construtorHashEmailWithParams.newInstance(object.getEmail(), object.getId()));
-        
+        hash.create(construtorHashWithParams.newInstance(object.getId(), endereco));     
 
         closeFile();
         return object.getId();
@@ -134,62 +122,6 @@ public class CRUD<T extends Registro, T2 extends RegistroHashExtensivel<T2>,
             closeFile();
         }
         catch(Exception e){
-            e.printStackTrace();
-        }
-        return objeto;
-    }
-
-    /**
-     * Lê um registro no arquivo sequencial através de um email.
-     * 
-     * @param email
-     * @return registro
-     * @throws Exception
-     */
-    public T read(String email) throws Exception{
-        T objeto = null;
-        byte[] ba;
-        int tam;
-        boolean isDeleted;
-        try{
-            //Lê-se o hash2 procurando pelo endereco do email.
-            T3 pcv = hash2.read(email.hashCode());
-
-            openFile();
-
-            //Caso o endereço exista e seja diferente de -1, prosseguir.
-            if(pcv != null && !pcv.getValorInt().equals(-1)){
-                T2 pcv2 = hash.read(pcv.getValorInt());
-                if(pcv2 != null && !pcv2.getValorLong().equals(-1))
-                {
-                    objeto = this.construtor.newInstance();
-
-                    //Pular no arquivo para o endereço salvo no indice.
-                    raf.seek(pcv2.getValorLong()); 
-                
-                    //Lê-se a lápide.
-                    isDeleted = raf.readBoolean();
-                
-                    //Caso o registro não tenha sido deletado, prossiga.
-                    if (!isDeleted) 
-                    {
-                        tam = raf.readInt();
-
-                        //Lê se o registro e o transforma em objeto.
-                        ba = new byte[tam];
-                        raf.read(ba);
-                        objeto.fromByteArray(ba);
-
-                        //If de segurança, para caso o indice falhe.
-                        if (!objeto.getEmail().equals(email)) 
-                            objeto = null;
-                    } 
-                    else
-                        objeto = null;
-                }
-                closeFile();
-            }
-        }catch(Exception e){
             e.printStackTrace();
         }
         return objeto;
@@ -280,22 +212,23 @@ public class CRUD<T extends Registro, T2 extends RegistroHashExtensivel<T2>,
      * @param id
      * @return true caso tenha sucesso.
      * @throws Exception
-     */
-    /* public boolean delete(int id) throws Exception {
+    */
+    public boolean delete(int id) throws Exception 
+    {
         boolean resp = false, isDeleted;
         T objeto = this.construtor.newInstance();
         byte[] ba;
         int tam;
         try{
             //Lê-se o hash procurando pelo endereco do id.
-            pcvUsuario pcv = hash.read(Integer.valueOf(id).hashCode());
+            T2 pcv = hash.read(id);
 
             openFile();
 
             //Caso o endereço exista e seja diferente de -1, prosseguir.
             if(pcv != null && pcv.getValor() != -1){
                 //Pula para o endereco do objeto. E armazena o endereço. 
-                raf.seek(pcv.getValor());
+                raf.seek(pos);
 
                 objeto = this.construtor.newInstance();
 
@@ -313,12 +246,11 @@ public class CRUD<T extends Registro, T2 extends RegistroHashExtensivel<T2>,
                     //If de segurança, para caso o indice falhe.
                     if (objeto.getId() == id) {
                         //Altera a lápide, deletando o registro.
-                        raf.seek(pcv.getValor());
+                        raf.seek(pos);
                         raf.writeBoolean(true);
                         
-                        //Deleta o indice no hash e hash2.
+                        //Deleta o indice no hash
                         resp = hash.delete(id);
-                        hash2.delete(objeto.getEmail().hashCode());
                     }
                 }
             }
@@ -327,7 +259,7 @@ public class CRUD<T extends Registro, T2 extends RegistroHashExtensivel<T2>,
             System.out.println("Erro: [ "+e.getCause()+" ]");
         } 
         return resp;
-    } */
+    }
 
     //Metódo para criar registro.
     public void createRegistro(T objeto) throws Exception{
