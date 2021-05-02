@@ -12,13 +12,6 @@ public class CRUD<T extends Registro, T2 extends RegistroHashExtensivel<T2>>
     private HashExtensivel<T2> hash;
     private String fileString;
 
-    /* public CRUD(Constructor<T> construtor, String fileString) throws Exception 
-    {
-        this.construtor = construtor;
-        this.fileString = fileString;
-        this.hash = new HashExtensivel<>(pcvUsuario.class.getConstructor(), 4, "dados/usuario.hash_d.db", "dados/usuario.hash_c.db");
-    } */
-
     public CRUD(Constructor<T> construtor, Constructor<T2> construtorHashWithParams, 
                 Constructor<T2> construtorHashWithoutParam,String db_d, String db_c,String fileString) throws Exception 
     {
@@ -226,9 +219,9 @@ public class CRUD<T extends Registro, T2 extends RegistroHashExtensivel<T2>>
             openFile();
 
             //Caso o endereço exista e seja diferente de -1, prosseguir.
-            if(pcv != null && pcv.getValor() != -1){
+            if(pcv != null && pcv.getValorLong() != -1){
                 //Pula para o endereco do objeto. E armazena o endereço. 
-                raf.seek(pos);
+                raf.seek(pcv.getValorLong());
 
                 objeto = this.construtor.newInstance();
 
@@ -246,7 +239,7 @@ public class CRUD<T extends Registro, T2 extends RegistroHashExtensivel<T2>>
                     //If de segurança, para caso o indice falhe.
                     if (objeto.getId() == id) {
                         //Altera a lápide, deletando o registro.
-                        raf.seek(pos);
+                        raf.seek(pcv.getValorLong());
                         raf.writeBoolean(true);
                         
                         //Deleta o indice no hash

@@ -7,6 +7,8 @@ public class Main {//extends RegistroHashExtensivel ?
   private static CRUD<Usuario, pcvUsuario> arqPessoas;
   private static HashExtensivel<pcvEmail> hashEmail;
 
+  public static int id_usuarioAtual;
+
   public static void main(String[] args) 
   {
     try{
@@ -77,6 +79,20 @@ public class Main {//extends RegistroHashExtensivel ?
     System.out.println("3) Notificacoes: "+notificacoes);
     System.out.println("\n0) Sair\n");
     System.out.print("Opcao:");
+  }
+
+  public static void menuCriacaoPergunta()
+  {
+    System.out.println("\n=============");
+    System.out.println("PERGUNTAS 1.0");
+    System.out.println("=============");
+    System.out.println("\nINICIO > CRIACAO DE PERGUNTAS");
+    System.out.println("\n1) Listar");
+    System.out.println("2) Incluir");
+    System.out.println("3) Alterar");
+    System.out.println("4) Arquivar");
+    System.out.println("\n0) Retornar ao menu anterior");
+    System.out.print("\nOpcao:");
   }
 
   //-------------------Usuarios-------------------------
@@ -160,28 +176,31 @@ public class Main {//extends RegistroHashExtensivel ?
       System.out.println("\n=============");
       System.out.println("ACESSO AO SISTEMA");
       String email = "";
-
+      int tam_email;
       do
       {
-      System.out.print("E-mail: ");
-      //Ler email e verificar se esse usuario ta cadastrado
-      email = sc.nextLine();
-      int tam_email = email.length();
-      if(tam_email >= 34)
-        System.out.println("O email não pode passar de 34 caracteres, atualmente tem "+tam_email);
-      else if(tam_email == 0)
-        System.out.println("Email nao pode contar 0 caracteres");
+        System.out.print("E-mail: ");
+        
+        email = sc.nextLine();//Ler email e verificar se esse usuario ta cadastrado
+
+        tam_email = email.length();
+        if(tam_email >= 34)
+          System.out.println("O email não pode passar de 34 caracteres, atualmente tem "+tam_email);
+        else if(tam_email == 0)
+          System.out.println("Email nao pode contar 0 caracteres");
       }while(tam_email > 0 && tam_email < 34);
 
       pcvEmail verificacao = hashEmail.read(email.hashCode());
       if (verificacao != null) 
       {
-        Usuario user = CRUD.read(verificacao.getValor());
+        Usuario user = arqPessoas.read(verificacao.getValor());
         System.out.print("Senha: ");
         String senha = sc.nextLine();
-        if (senha.hashCode() == user.getSenha())
+        if (senha.hashCode() == user.getSenha()){
           //rediciona para a tela principal
+          id_usuarioAtual = user.getId();
           sistemaPerguntas(sc);
+        }
         else
           System.out.println("\nSenha invalida\n");
       }
@@ -210,11 +229,11 @@ public class Main {//extends RegistroHashExtensivel ?
       {
         verificacao = hashEmail.read(email.hashCode());
 
-        if(user == null)
+        if(verificacao == null)
           System.out.println("Email não cadastrado. Voltando para o menu...");
         else
         {
-          Usuario user = CRUD.read(verificacao.getValor());
+          Usuario user = arqPessoas.read(verificacao.getValor());
           System.out.println("Pergunta Secreta: "+user.getPerguntaSecreta());
           String resposta = sc.nextLine();
           String senha;
@@ -265,7 +284,7 @@ public class Main {//extends RegistroHashExtensivel ?
       switch (opcode)
       {
         case 1: 
-         // criacaoPerguntas(sc);
+          criacaoPerguntas(sc);
           break;
         
         case 2: System.out.println("Consultar/responder perguntas sera implementado no futuro");
@@ -281,5 +300,74 @@ public class Main {//extends RegistroHashExtensivel ?
           System.out.println("\n\nValor invalido, digite novamente");
       }
     }
+  }
+
+  public static void criacaoPerguntas(Scanner sc)
+  {
+    int opcode = -1;
+    //menu Perguntas
+    while (opcode != 0)
+    {
+      menuCriacaoPergunta(); 
+      opcode = sc.nextInt();
+      sc.nextLine();
+      switch (opcode)
+      {
+        case 1: listaPerguntas(sc);
+          System.out.println("Pressione qualquer tecla para continuar...");
+          sc.nextLine();
+          break;
+        
+        case 2: incluirPerguntas(sc);
+          break;
+
+        case 3: alterarPerguntas(sc);
+          break;
+
+        case 4: arquivamentoPerguntas(sc);
+          break;
+
+        case 0: 
+          System.out.println("\nRetornando ao menu...");
+          break;
+
+        default:
+          System.out.println("\n\nValor invalido, digite novamente");
+      }
+    }
+  }
+
+  public static void listaPerguntas(Scanner sc)
+  {
+    System.out.println("MINHAS PERGUNTAS\n");
+    //faltando a lista de perguntas
+  }
+
+  public static void incluirPerguntas(Scanner sc)
+  {
+    System.out.print("\nDigite a sua pergunta:");
+    String pergunta = sc.nextLine();
+    //faltando a inclusao da pergunta
+  }
+
+  public static void alterarPerguntas(Scanner sc)
+  {
+    System.out.println("\nVeja qual pergunta voce deseja alterar, lembrando que apenas as perguntas que nao possuem repostas podem ser alteradas");
+    listaPerguntas(sc);
+    System.out.print("Opcao:");
+    int pergunta = sc.nextInt();
+    //faltando verificacao se a pergunta possui resposta
+    System.out.print("\nDigite a sua nova pergunta:");
+    String novaPergunta = sc.nextLine();
+    //faltando atualizar pergunta propriamente dita
+  }
+
+  public static void arquivamentoPerguntas(Scanner sc)
+  {
+    System.out.println("\nEscolha a pergunta que vc deseja arquivar:");
+    listaPerguntas(sc);
+    System.out.print("Opcao:");
+    int pergunta = sc.nextInt();
+    //faltando arquivar a pergunta
   }
 }

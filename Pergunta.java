@@ -79,18 +79,12 @@ public class Pergunta implements Registro{
         + idUsuario + ", nota=" + nota + ", pergunta=" + pergunta + "]";
   }
 
-  //NECESSARIO PARA USO NO CRUD
-  public String getEmail(){
-    return "";
-  }
-  public void setEmail(String email){
-  }
-
   public int getId(){
-    return -1;
+    return getIdPergunta();
   }
 
   public void setId(int id){
-    
+    setIdPergunta(id);
   }
+
 }
