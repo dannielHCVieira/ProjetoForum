@@ -267,7 +267,7 @@ public class HashExtensivel<T extends RegistroHashExtensivel<T>> {
   }
 
   public HashExtensivel(Constructor<T> ct, int n, String nd, String nc) throws Exception {
-    construtor = ct;
+    this.construtor = ct;
     quantidadeDadosPorCesto = n;
     nomeArquivoDiretorio = nd;
     nomeArquivoCestos = nc;
@@ -285,7 +285,7 @@ public class HashExtensivel<T extends RegistroHashExtensivel<T>> {
       arqDiretorio.write(bd);
 
       // Cria um cesto vazio, já apontado pelo único elemento do diretório
-      Cesto c = new Cesto(construtor, quantidadeDadosPorCesto);
+      Cesto c = new Cesto(this.construtor, quantidadeDadosPorCesto);
       bd = c.toByteArray();
       arqCestos.seek(0);
       arqCestos.write(bd);

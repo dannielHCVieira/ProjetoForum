@@ -13,7 +13,7 @@ public class CRUD<T extends Registro, T2 extends RegistroHashExtensivel<T2>>
     private String fileString;
 
     public CRUD(Constructor<T> construtor, Constructor<T2> construtorHashWithParams, 
-                Constructor<T2> construtorHashWithoutParam,String db_d, String db_c,String fileString) throws Exception 
+                Constructor<T2> construtorHashWithoutParams,String db_d, String db_c,String fileString) throws Exception 
     {
         this.construtor = construtor;
         this.construtorHashWithParams = construtorHashWithParams;

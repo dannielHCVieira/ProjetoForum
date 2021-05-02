@@ -188,7 +188,7 @@ public class Main {//extends RegistroHashExtensivel ?
           System.out.println("O email não pode passar de 34 caracteres, atualmente tem "+tam_email);
         else if(tam_email == 0)
           System.out.println("Email nao pode contar 0 caracteres");
-      }while(tam_email > 0 && tam_email < 34);
+      }while(tam_email == 0 || tam_email >= 34);
 
       pcvEmail verificacao = hashEmail.read(email.hashCode());
       if (verificacao != null) 
