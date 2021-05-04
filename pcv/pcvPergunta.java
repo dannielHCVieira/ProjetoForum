@@ -1,23 +1,23 @@
 /***
- * Esta classe representa o PAR CHAVE VALOR de um Usuario.
- * Chave: Email
- * Valor: Id
+ * Esta classe representa o PAR CHAVE VALOR de um Pergunta.
+ * Chave: Id
+ * Valor: Endereço
 ***/
 
 import java.io.*;
 
-public class pcvEmail implements RegistroHashExtensivel<pcvEmail> 
+public class pcvPergunta implements RegistroHashExtensivel<pcvPergunta> 
 {
-  private String chave; // email
-  private int    valor; // id 
-  private short TAMANHO = 34;
+  private Integer chave;
+  private long valor;
+  private short TAMANHO = 20;
 
-  public pcvEmail()
+  public pcvPergunta()
   {
-    this("",-1);
+    this(-1,-1);
   }
 
-  public pcvEmail(String chave, int valor)
+  public pcvPergunta(int chave, long valor)
   {
     this.chave = chave;
     this.valor = valor; 
@@ -40,8 +40,8 @@ public class pcvEmail implements RegistroHashExtensivel<pcvEmail>
   {
     ByteArrayOutputStream baos = new ByteArrayOutputStream();
     DataOutputStream dos = new DataOutputStream(baos);
-    dos.writeUTF(this.chave); // Possibilidade de transformar criar um HashCode para email e armazenar apenas o hash (?)
-    dos.writeInt(this.valor);
+    dos.writeInt(this.chave);
+    dos.writeLong(this.valor);
     byte[] ba = baos.toByteArray();
     byte[] ba2 = new byte[TAMANHO];
     for (int i = 0; i < TAMANHO; i++)
@@ -56,38 +56,37 @@ public class pcvEmail implements RegistroHashExtensivel<pcvEmail>
   {
     ByteArrayInputStream bais = new ByteArrayInputStream(ba);
     DataInputStream dis = new DataInputStream(bais);
-    this.chave = dis.readUTF();
-    this.valor = dis.readInt();
+    this.chave = dis.readInt();
+    this.valor = dis.readLong();
   }
 
-  public String getChave() 
+  public Integer getChave() 
   {
     return chave;
   }
 
-  public void setChave(String chave) 
+  public void setChave(Integer chave) 
   {
     this.chave = chave;
   }
 
-  public Integer getValor()
+  public Long getValor() 
   {
-    return getValorInt();
-  }
-
-  public Integer getValorInt() 
-  {
-    return valor;
-  }
-
-  public void setValor(int valor) 
-  {
-    this.valor = valor;
+    return getValorLong();
   }
 
   public Long getValorLong()
   {
-    long o = 0;
-    return o;
+    return valor;
+  }
+
+  public void setValor(long valor) 
+  {
+    this.valor = valor;
+  }
+
+  public Integer getValorInt()
+  {
+    return 0;
   }
 }

@@ -1,59 +1,45 @@
 import java.io.*;
 import java.util.Scanner;
+import java.util.Calendar;
+import java.text.SimpleDateFormat;
 
-public class Main {//extends RegistroHashExtensivel ?
-
+public class Main 
+{
   // Arquivo declarado fora de main() para ser poder ser usado por outros métodos
   private static CRUD<Usuario, pcvUsuario> arqPessoas;
+  private static CRUD<Pergunta, pcvPergunta> arqPerguntas;
   private static HashExtensivel<pcvEmail> hashEmail;
+  private static ArvoreBMais_ChaveComposta_Int_Int arvB_P;
 
-  public static int id_usuarioAtual;
+  public static int usuarioAtual;
 
   public static void main(String[] args) 
   {
-    try{
+    try
+    {
       //criacao do crud
       arqPessoas = new CRUD<>(Usuario.class.getConstructor(),
       pcvUsuario.class.getDeclaredConstructor(int.class,long.class),
-      pcvUsuario.class.getConstructor(), 
-      "dados/usuario_hash_d.db","dados/usuario_hash_c.db","dados/usuarios.db");
+      pcvUsuario.class.getConstructor(), "dados/usuario_hash_d.db","dados/usuario_hash_c.db","dados/usuarios.db");
+      arqPerguntas = new CRUD<>(Pergunta.class.getConstructor(),
+      pcvPergunta.class.getDeclaredConstructor(int.class,long.class),
+      pcvPergunta.class.getConstructor(), "dados/pergunta_hash_d.db","dados/usuario_hash_c.db","dados/perguntas.db");
       //criacao hashEmail
       hashEmail = new HashExtensivel<>(pcvEmail.class.getConstructor(), 4, "dados/email_hash_d.db", "dados/email_hash_c.db");
-
-      int opcode = -1;
+      //criacao arvoreB+_idUsuario_idPergunta
+      arvB_P = new ArvoreBMais_ChaveComposta_Int_Int(255, "dados/arvore.db");
       Scanner sc = new Scanner(System.in);
       //menu principal
-      while (opcode != 0)
-      {
-        menuPrincipal();
-        opcode = sc.nextInt();
-        sc.nextLine();
-        switch (opcode)
-        {
-          case 1: acessoSistemaUsuario(sc);
-            break;
-          
-          case 2: novoUsuario(sc);
-            break;
-
-          case 3: esqueciSenha(sc);
-            break;
-          case 0: 
-            System.out.println("\nFechando sistema...");
-            break;
-
-          default:
-            System.out.println("\n\nValor invalido, digite novamente");
-        }
-      }
+      sistemaUsuario(sc);
       sc.close();
-    }catch(Exception e){
+    }
+    catch(Exception e)
+    {
       e.printStackTrace();
     }
   }
 
   //---------------------Menus------------------------
-
   public static void menuPrincipal()
   {
     System.out.println("\n=============");
@@ -63,11 +49,9 @@ public class Main {//extends RegistroHashExtensivel ?
     System.out.println("1) Acesso ao sistema");
     System.out.println("2) Novo usuario (primeiro acesso)");
     System.out.println("3) Esqueci a senha\n");
-
-    System.out.println("0) Sair");
+    System.out.println("0) Sair\n");
     System.out.print("Digite sua escolha:");
   }
-
   public static void menuPerguntas(int notificacoes)
   {
     System.out.println("\n=============");
@@ -80,7 +64,6 @@ public class Main {//extends RegistroHashExtensivel ?
     System.out.println("\n0) Sair\n");
     System.out.print("Opcao:");
   }
-
   public static void menuCriacaoPergunta()
   {
     System.out.println("\n=============");
@@ -94,8 +77,30 @@ public class Main {//extends RegistroHashExtensivel ?
     System.out.println("\n0) Retornar ao menu anterior");
     System.out.print("\nOpcao:");
   }
-
   //-------------------Usuarios-------------------------
+  public static void sistemaUsuario(Scanner sc)
+  {
+    int opcode = -1;
+    do
+    {
+      menuPrincipal();
+      opcode = sc.nextInt();
+      sc.nextLine();
+      switch (opcode)
+      {
+        case 1: acessoSistemaUsuario(sc);
+        break;
+        case 2: novoUsuario(sc);
+        break;
+        case 3: esqueciSenha(sc);
+        break;
+        case 0: System.out.println("\nFechando sistema...");
+        break;
+        default: System.out.println("\n\nValor invalido, digite novamente");
+      }
+    }
+    while (opcode != 0);
+  }
   public static void novoUsuario(Scanner sc)
   {
     try
@@ -119,45 +124,48 @@ public class Main {//extends RegistroHashExtensivel ?
         {
           //criar um novo usuario no sistema com os dados inseridos
           Usuario user = new Usuario(); 
-          do{
+          do
+          {
             System.out.print("Nome: ");
             nome = sc.nextLine();
-          }while(nome.length() == 0);
-
-          do{
+          }
+          while(nome.length() == 0);
+          do
+          {
             System.out.print("Senha: ");
             senha = sc.nextLine();
             System.out.print("Digite sua senha novamente: ");
-          }while(!sc.nextLine().equals(senha) || senha.length() == 0);
-
-          do{
+          }
+          while(!sc.nextLine().equals(senha) || senha.length() == 0);
+          do
+          {
             System.out.print("\nDigite uma pergunta secreta que sera usada caso esqueça a senha:");
             pergunta = sc.nextLine();
             System.out.print("\nAgora a resposta da pergunta:");
             resposta = sc.nextLine();
-          }while(pergunta.length() == 0 && resposta.length() == 0);
-          
+          }
+          while(pergunta.length() == 0 && resposta.length() == 0);
           System.out.println("\n\nConfirme seus dados:");
           System.out.println("Email: " + email);
           System.out.println("Nome: " + nome);
           System.out.println("Senha: " + senha);
           System.out.println("Pergunta Secreta: " + pergunta);
           System.out.println("Resposta Secreta: " + resposta);
-
           System.out.print("Confirmar? (Y/N) ");
-          if(sc.nextLine().toUpperCase().equals("Y")){
+          if(sc.nextLine().toUpperCase().equals("Y"))
+          {
             user.setEmail(email);
             user.setNome(nome);
             user.setSenha(senha.hashCode());
             user.setPerguntaSecreta(pergunta);
             user.setRespostaSecreta(resposta);
-
             arqPessoas.create(user);
             pcvEmail criacao = new pcvEmail(user.getEmail(), user.getId());
             hashEmail.create(criacao);
             System.out.println("\nUsuário cadastrado com sucesso\n");
           }
-          else{
+          else
+          {
             System.out.println("\nCadastro de Usuário cancelado.\n");
           }
         }
@@ -168,7 +176,6 @@ public class Main {//extends RegistroHashExtensivel ?
       erro.printStackTrace();
     }
   }
-
   public static void acessoSistemaUsuario(Scanner sc)
   {
     try
@@ -179,26 +186,25 @@ public class Main {//extends RegistroHashExtensivel ?
       int tam_email;
       do
       {
-        System.out.print("E-mail: ");
-        
+        System.out.print("E-mail: ");     
         email = sc.nextLine();//Ler email e verificar se esse usuario ta cadastrado
-
         tam_email = email.length();
         if(tam_email >= 34)
           System.out.println("O email não pode passar de 34 caracteres, atualmente tem "+tam_email);
         else if(tam_email == 0)
           System.out.println("Email nao pode contar 0 caracteres");
-      }while(tam_email == 0 || tam_email >= 34);
-
+      }
+      while(tam_email == 0 || tam_email >= 34);
       pcvEmail verificacao = hashEmail.read(email.hashCode());
       if (verificacao != null) 
       {
         Usuario user = arqPessoas.read(verificacao.getValor());
         System.out.print("Senha: ");
         String senha = sc.nextLine();
-        if (senha.hashCode() == user.getSenha()){
+        if (senha.hashCode() == user.getSenha())
+        {
           //rediciona para a tela principal
-          id_usuarioAtual = user.getId();
+          usuarioAtual = user.getId();
           sistemaPerguntas(sc);
         }
         else
@@ -212,7 +218,6 @@ public class Main {//extends RegistroHashExtensivel ?
       erro.printStackTrace();
     }
   }
-
   public static void esqueciSenha(Scanner sc)
   {
     try
@@ -222,24 +227,21 @@ public class Main {//extends RegistroHashExtensivel ?
       System.out.print("E-mail: ");
       String email = sc.nextLine();
       pcvEmail verificacao;
-
       if(email.length() == 0)
         System.out.println("Email invalido. Voltando para o menu...");
       else
       {
         verificacao = hashEmail.read(email.hashCode());
-
         if(verificacao == null)
           System.out.println("Email não cadastrado. Voltando para o menu...");
         else
         {
           Usuario user = arqPessoas.read(verificacao.getValor());
-          System.out.println("Pergunta Secreta: "+user.getPerguntaSecreta());
+          System.out.print("Pergunta Secreta: "+user.getPerguntaSecreta()+":");
           String resposta = sc.nextLine();
           String senha;
-
           if(!resposta.equals(user.getRespostaSecreta()))
-            System.out.println("Resposta errada. Voltando para o menu...");
+            System.out.println("\nResposta errada. Voltando para o menu...");
           else
           {
             do
@@ -247,15 +249,14 @@ public class Main {//extends RegistroHashExtensivel ?
               System.out.print("\nNova senha: ");
               senha = sc.nextLine();
               System.out.print("Digite novamente a nova senha: ");
-            }while(!sc.nextLine().equals(senha) && senha.length() == 0);
-
+            }
+            while(!sc.nextLine().equals(senha) && senha.length() == 0);
             System.out.println("\n\nConfirme seus dados:");
             System.out.println("Senha: " + senha);
             System.out.print("Confirmar? (Y/N) ");
             if(sc.nextLine().toUpperCase().equals("Y"))
             {
               user.setSenha(senha.hashCode());
-
               arqPessoas.update(user);
               System.out.println("\nSenha atualizada com sucesso\n");
             }
@@ -265,13 +266,12 @@ public class Main {//extends RegistroHashExtensivel ?
         }
       }
     }
-    catch(Exception e){
-       e.printStackTrace();
+    catch(Exception e)
+    {
+      e.printStackTrace();
     }
   }
-
   //---------------------------Perguntas------------------------
-
   public static void sistemaPerguntas(Scanner sc)
   {
     int opcode = -1;
@@ -283,25 +283,18 @@ public class Main {//extends RegistroHashExtensivel ?
       sc.nextLine();
       switch (opcode)
       {
-        case 1: 
-          criacaoPerguntas(sc);
-          break;
-        
-        case 2: System.out.println("Consultar/responder perguntas sera implementado no futuro");
-          break;
-
-        case 3: System.out.println("Notificacoes sera implementado no futuro");
-          break;
-        case 0: 
-          System.out.println("\nFechando sistema...");
-          break;
-
-        default:
-          System.out.println("\n\nValor invalido, digite novamente");
+        case 1: criacaoPerguntas(sc);
+        break;
+        case 2: System.out.println("\nConsultar/responder perguntas sera implementado no futuro");
+        break;
+        case 3: System.out.println("\nNotificacoes sera implementado no futuro");
+        break;
+        case 0: System.out.println("\nFechando sistema...");
+        break;
+        default: System.out.println("\n\nValor invalido, digite novamente");
       }
     }
   }
-
   public static void criacaoPerguntas(Scanner sc)
   {
     int opcode = -1;
@@ -313,61 +306,174 @@ public class Main {//extends RegistroHashExtensivel ?
       sc.nextLine();
       switch (opcode)
       {
-        case 1: listaPerguntas(sc);
-          System.out.println("Pressione qualquer tecla para continuar...");
+        case 1: 
+          listaPerguntas(sc);
+          System.out.println("Pressione Enter para continuar...");
           sc.nextLine();
-          break;
-        
+        break;
         case 2: incluirPerguntas(sc);
-          break;
-
+        break;
         case 3: alterarPerguntas(sc);
-          break;
-
+        break;
         case 4: arquivamentoPerguntas(sc);
-          break;
-
-        case 0: 
-          System.out.println("\nRetornando ao menu...");
-          break;
-
-        default:
-          System.out.println("\n\nValor invalido, digite novamente");
+        break;
+        case 0:  System.out.println("\nRetornando ao menu...");
+        break;
+        default: System.out.println("\n\nValor invalido, digite novamente");
       }
     }
   }
-
-  public static void listaPerguntas(Scanner sc)
+  public static int[] listaPerguntas(Scanner sc)
   {
-    System.out.println("MINHAS PERGUNTAS\n");
-    //faltando a lista de perguntas
+    int[] arrayIdPerguntas = new int[0];
+    try
+    {
+      System.out.println("\nMINHAS PERGUNTAS\n");
+      // Lê-se todos os idPerguntas do usuario atual
+      arrayIdPerguntas = arvB_P.read(usuarioAtual); 
+
+      //Imprime cada pergunta a partir do idPergunta pesquisado no indice.
+      Pergunta p;
+      for(int i = 0; i < arrayIdPerguntas.length; i++)  
+      {
+        p = arqPerguntas.read(arrayIdPerguntas[i]);
+        System.out.print(i+1 + ".");
+        printPergunta(p);
+      }
+    }
+    catch(Exception e)
+    {
+      e.printStackTrace();
+    }
+
+    return arrayIdPerguntas;
   }
 
   public static void incluirPerguntas(Scanner sc)
   {
-    System.out.print("\nDigite a sua pergunta:");
-    String pergunta = sc.nextLine();
-    //faltando a inclusao da pergunta
+    try
+    {
+      System.out.print("\nDigite a sua pergunta:");
+      String pergunta = sc.nextLine();
+
+      System.out.println("\n\nConfirme seus dados:");
+      System.out.println("Pergunta:\n " + pergunta);
+      System.out.print("Confirmar? (Y/N) ");
+      if(sc.nextLine().toUpperCase().equals("Y"))
+      {
+        Pergunta question = new Pergunta();
+        question.setIdUsuario(usuarioAtual);
+        question.setPergunta(pergunta);
+        question.setNota((short)0); 
+        question.setCriacao(); //Metodo interno já obtem a data e a hora.
+        question.setAtiva(true);   
+
+        arqPerguntas.create(question);
+        arvB_P.create(usuarioAtual,question.getId());
+        System.out.println("\nPergunta criada com sucesso.\n");
+      }
+      else
+        System.out.println("\nCriação de pergunta cancelada.\n");
+    }
+    catch(Exception e)
+    {
+      e.printStackTrace();
+    }
   }
 
   public static void alterarPerguntas(Scanner sc)
   {
-    System.out.println("\nVeja qual pergunta voce deseja alterar, lembrando que apenas as perguntas que nao possuem repostas podem ser alteradas");
-    listaPerguntas(sc);
-    System.out.print("Opcao:");
-    int pergunta = sc.nextInt();
-    //faltando verificacao se a pergunta possui resposta
-    System.out.print("\nDigite a sua nova pergunta:");
-    String novaPergunta = sc.nextLine();
-    //faltando atualizar pergunta propriamente dita
+    try{
+      System.out.println("\nVeja qual pergunta voce deseja alterar, lembrando que apenas as perguntas que nao possuem repostas podem ser alteradas");
+      int[] listaPerguntas = listaPerguntas(sc);
+      System.out.println("\nDigite o número da pergunta que queira alterar.");
+      System.out.println("\n0) Retornar para CRIACAO DE PERGUNTAS");
+      System.out.print("\nOpcao:");
+      int iPergunta = sc.nextInt();
+      sc.nextLine();
+      if (iPergunta != 0)
+      {
+        Pergunta pergunta = arqPerguntas.read(listaPerguntas[iPergunta-1]);
+
+        if(pergunta.isAtiva()){
+          printPergunta(pergunta);
+
+          System.out.println("\nDigite a pergunta alterada:");
+          String perguntaAlt = sc.nextLine();
+
+          if(perguntaAlt.length() != 0){
+            System.out.println("\n\nConfirme seus dados:");
+            System.out.println("Pergunta:\n " + perguntaAlt);
+            System.out.print("Confirmar? (Y/N) ");
+            if(sc.nextLine().toUpperCase().equals("Y"))
+            {
+              pergunta.setPergunta(perguntaAlt);
+
+              arqPerguntas.update(pergunta);
+              System.out.println("\nPergunta atualizada com sucesso.\n");
+            }
+            else
+              System.out.println("\nAtualização de pergunta cancelada.\n");
+          }
+          else
+            System.out.println("\nAtualização vazia.\n");
+        }
+        else
+          System.out.println("\nPergunta arquivada não pode ser alterada.\n");
+      }
+    }catch(Exception e){
+      e.printStackTrace();
+    }
   }
 
   public static void arquivamentoPerguntas(Scanner sc)
   {
-    System.out.println("\nEscolha a pergunta que vc deseja arquivar:");
-    listaPerguntas(sc);
-    System.out.print("Opcao:");
-    int pergunta = sc.nextInt();
-    //faltando arquivar a pergunta
+    try{
+      System.out.println("\nEscolha a pergunta que vc deseja arquivar:");
+      int[] listaPerguntas = listaPerguntas(sc);
+      System.out.println("\nDigite o número da pergunta que queira arquivar.");
+      System.out.println("\n0) Retornar para CRIACAO DE PERGUNTAS");
+      System.out.print("\nOpcao:");
+      int iPergunta = sc.nextInt();
+      sc.nextLine();
+      if (iPergunta != 0)
+      {
+        Pergunta pergunta = arqPerguntas.read(listaPerguntas[iPergunta-1]);
+
+        if(pergunta.isAtiva()){
+          System.out.println("\n\nConfirme seus dados:");
+          System.out.println("Pergunta: ");
+          printPergunta(pergunta);
+          System.out.print("Confirmar? (Y/N) ");
+          if(sc.nextLine().toUpperCase().equals("Y"))
+          {
+            pergunta.setAtiva(false);
+
+            arqPerguntas.update(pergunta);
+            System.out.println("\nPergunta atualizada com sucesso.\n");
+          }
+          else
+            System.out.println("\nAtualização de pergunta cancelada.\n");
+        }
+        else
+          System.out.println("\nPergunta já arquivada.\n");
+      }
+    }catch(Exception e){
+      e.printStackTrace();
+    }
+  }
+  
+  public static void printPergunta(Pergunta p)
+  {
+    if(!p.isAtiva())
+    {
+      System.out.print(" (Arquivada)");
+    }
+    System.out.print("\n");
+    Calendar calendar = Calendar.getInstance();
+    calendar.setTimeInMillis(p.getCriacao());
+    SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+    System.out.println(formatter.format(calendar.getTime()));
+    System.out.println(p.getPergunta()+"\n");
   }
 }

@@ -1,83 +1,92 @@
-/** 
+/***
  * Esta classe representa o PAR CHAVE VALOR de um Usuario.
  * Chave: Id
  * Valor: Endereço
-*/
+***/
 
 import java.io.*;
 
-public class pcvUsuario implements RegistroHashExtensivel<pcvUsuario> {
-    private Integer chave;
-    private long valor;
-    private short TAMANHO = 20;
+public class pcvUsuario implements RegistroHashExtensivel<pcvUsuario> 
+{
+  private Integer chave;
+  private long valor;
+  private short TAMANHO = 20;
 
-    public pcvUsuario(){
-        this(-1,-1);
-    }
+  public pcvUsuario()
+  {
+    this(-1,-1);
+  }
 
-    public pcvUsuario(int chave, long valor){
-        this.chave = chave;
-        this.valor = valor; 
-    }
+  public pcvUsuario(int chave, long valor)
+  {
+    this.chave = chave;
+    this.valor = valor; 
+  }
 
-    @Override
-    public int hashCode() {
-        return this.chave.hashCode();
-    }
+  @Override
+  public int hashCode() 
+  {
+    return this.chave.hashCode();
+  }
 
-    @Override
-    public short size() {
-        return this.TAMANHO;
-    }
+  @Override
+  public short size() 
+  {
+    return this.TAMANHO;
+  }
 
-    @Override
-    public byte[] toByteArray() throws IOException {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        DataOutputStream dos = new DataOutputStream(baos);
-        dos.writeInt(this.chave);
-        dos.writeLong(this.valor);
+  @Override
+  public byte[] toByteArray() throws IOException 
+  {
+    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+    DataOutputStream dos = new DataOutputStream(baos);
+    dos.writeInt(this.chave);
+    dos.writeLong(this.valor);
+    byte[] ba = baos.toByteArray();
+    byte[] ba2 = new byte[TAMANHO];
+    for (int i = 0; i < TAMANHO; i++)
+      ba2[i] = ' ';
+    for (int i = 0; i < ba.length && i < TAMANHO; i++)
+      ba2[i] = ba[i];
+    return ba2;
+  }
 
-        byte[] ba = baos.toByteArray();
-        byte[] ba2 = new byte[TAMANHO];
+  @Override
+  public void fromByteArray(byte[] ba) throws IOException 
+  {
+    ByteArrayInputStream bais = new ByteArrayInputStream(ba);
+    DataInputStream dis = new DataInputStream(bais);
+    this.chave = dis.readInt();
+    this.valor = dis.readLong();
+  }
 
-        for (int i = 0; i < TAMANHO; i++)
-            ba2[i] = ' ';
-        for (int i = 0; i < ba.length && i < TAMANHO; i++)
-            ba2[i] = ba[i];
+  public Integer getChave() 
+  {
+    return chave;
+  }
 
-        return ba2;
-    }
+  public void setChave(Integer chave) 
+  {
+    this.chave = chave;
+  }
 
-    @Override
-    public void fromByteArray(byte[] ba) throws IOException {
-        ByteArrayInputStream bais = new ByteArrayInputStream(ba);
-        DataInputStream dis = new DataInputStream(bais);
-        this.chave = dis.readInt();
-        this.valor = dis.readLong();
-    }
+  public Long getValor() 
+  {
+    return getValorLong();
+  }
 
-    public Integer getChave() {
-        return chave;
-    }
+  public Long getValorLong()
+  {
+    return valor;
+  }
 
-    public void setChave(Integer chave) {
-        this.chave = chave;
-    }
+  public void setValor(long valor) 
+  {
+    this.valor = valor;
+  }
 
-    public Long getValor() {
-        return getValorLong();
-    }
-
-    public Long getValorLong(){
-        return valor;
-    }
-
-    public void setValor(long valor) {
-        this.valor = valor;
-    }
-
-    public Integer getValorInt(){
-      return 0;
-    }
-    
+  public Integer getValorInt()
+  {
+    return 0;
+  }
 }
