@@ -101,7 +101,51 @@ public class Main
     }
     while (opcode != 0);
   }
-  public static void novoUsuario(Scanner sc)
+
+  public static void acessoSistemaUsuario(Scanner sc)
+  {
+    try
+    {
+      System.out.println("\n=============");
+      System.out.println("ACESSO AO SISTEMA");
+      String email = "";
+      int tam_email;
+      do
+      {
+        System.out.print("E-mail: ");     
+        email = sc.nextLine();//Ler email e verificar se esse usuario ta cadastrado
+        tam_email = email.length();
+        if(tam_email >= 34)
+          System.out.println("O email não pode passar de 34 caracteres, atualmente tem "+tam_email);
+        else if(tam_email == 0)
+          System.out.println("Email nao pode contar 0 caracteres");
+      }
+      while(tam_email == 0 || tam_email >= 34);
+      pcvEmail verificacao = hashEmail.read(email.hashCode());
+      if (verificacao != null) 
+      {
+        Usuario user = arqPessoas.read(verificacao.getValor());
+        System.out.print("Senha: ");
+        String senha = sc.nextLine();
+        if (senha.hashCode() == user.getSenha())
+        {
+          //rediciona para a tela principal
+          usuarioAtual = user.getId();
+          sistemaPerguntas(sc);
+        }
+        else
+          System.out.println("\nSenha invalida\n");
+      }
+      else
+        System.out.println("\nEmail nao cadastrado\n");
+    }
+    catch(Exception erro)
+    {
+      erro.printStackTrace();
+    }
+  }
+
+public static void novoUsuario(Scanner sc)
   {
     try
     {
@@ -176,48 +220,7 @@ public class Main
       erro.printStackTrace();
     }
   }
-  public static void acessoSistemaUsuario(Scanner sc)
-  {
-    try
-    {
-      System.out.println("\n=============");
-      System.out.println("ACESSO AO SISTEMA");
-      String email = "";
-      int tam_email;
-      do
-      {
-        System.out.print("E-mail: ");     
-        email = sc.nextLine();//Ler email e verificar se esse usuario ta cadastrado
-        tam_email = email.length();
-        if(tam_email >= 34)
-          System.out.println("O email não pode passar de 34 caracteres, atualmente tem "+tam_email);
-        else if(tam_email == 0)
-          System.out.println("Email nao pode contar 0 caracteres");
-      }
-      while(tam_email == 0 || tam_email >= 34);
-      pcvEmail verificacao = hashEmail.read(email.hashCode());
-      if (verificacao != null) 
-      {
-        Usuario user = arqPessoas.read(verificacao.getValor());
-        System.out.print("Senha: ");
-        String senha = sc.nextLine();
-        if (senha.hashCode() == user.getSenha())
-        {
-          //rediciona para a tela principal
-          usuarioAtual = user.getId();
-          sistemaPerguntas(sc);
-        }
-        else
-          System.out.println("\nSenha invalida\n");
-      }
-      else
-        System.out.println("\nEmail nao cadastrado\n");
-    }
-    catch(Exception erro)
-    {
-      erro.printStackTrace();
-    }
-  }
+
   public static void esqueciSenha(Scanner sc)
   {
     try
@@ -357,7 +360,7 @@ public class Main
       String pergunta = sc.nextLine();
 
       System.out.println("\n\nConfirme seus dados:");
-      System.out.println("Pergunta:\n " + pergunta);
+      System.out.println("Pergunta:" + pergunta);
       System.out.print("Confirmar? (Y/N) ");
       if(sc.nextLine().toUpperCase().equals("Y"))
       {
@@ -398,12 +401,12 @@ public class Main
         if(pergunta.isAtiva()){
           printPergunta(pergunta);
 
-          System.out.println("\nDigite a pergunta alterada:");
+          System.out.print("\nDigite a pergunta alterada:");
           String perguntaAlt = sc.nextLine();
 
           if(perguntaAlt.length() != 0){
             System.out.println("\n\nConfirme seus dados:");
-            System.out.println("Pergunta:\n " + perguntaAlt);
+            System.out.println("Pergunta:" + perguntaAlt);
             System.out.print("Confirmar? (Y/N) ");
             if(sc.nextLine().toUpperCase().equals("Y"))
             {
@@ -442,9 +445,9 @@ public class Main
 
         if(pergunta.isAtiva()){
           System.out.println("\n\nConfirme seus dados:");
-          System.out.println("Pergunta: ");
+          System.out.print("Pergunta: ");
           printPergunta(pergunta);
-          System.out.print("Confirmar? (Y/N) ");
+          System.out.print("\nConfirmar? (Y/N) ");
           if(sc.nextLine().toUpperCase().equals("Y"))
           {
             pergunta.setAtiva(false);

@@ -12,7 +12,6 @@ public class Pergunta implements Registro
   private long criacao;
   private short nota;
   private String pergunta;
-  private boolean ativa;
 
   public Pergunta()
   {
@@ -26,7 +25,6 @@ public class Pergunta implements Registro
     this.pergunta = pergunta;
     this.criacao = 0;
     this.nota = 0;
-    this.ativa = true;
   }
   
   public byte[] toByteArray() throws IOException
@@ -38,7 +36,6 @@ public class Pergunta implements Registro
     dos.writeLong(criacao);
     dos.writeShort(nota);
     dos.writeUTF(pergunta);
-    dos.writeBoolean(ativa);
     return baos.toByteArray();
   }
 
@@ -51,7 +48,6 @@ public class Pergunta implements Registro
     this.criacao = dis.readLong();
     this.nota = dis.readShort();
     this.pergunta = dis.readUTF();
-    this.ativa = dis.readBoolean();
   } 
 
   public int getIdPergunta() 
@@ -110,20 +106,10 @@ public class Pergunta implements Registro
     this.pergunta = pergunta;
   }
 
-  public boolean isAtiva() 
-  {
-    return ativa;
-  }
-
-  public void setAtiva(boolean ativa) 
-  {
-    this.ativa = ativa;
-  }
-
   @Override
   public String toString() 
   {
-    return "Pergunta [ativa=" + ativa + ", criacao=" + criacao + ", idPergunta=" + idPergunta + ", idUsuario="
+    return "Pergunta [criacao=" + criacao + ", idPergunta=" + idPergunta + ", idUsuario="
         + idUsuario + ", nota=" + nota + ", pergunta=" + pergunta + "]";
   }
 
