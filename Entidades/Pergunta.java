@@ -2,6 +2,7 @@ import java.io.*;
 import java.util.Calendar;
 import java.util.TimeZone;
 import java.text.SimpleDateFormat;
+import java.text.Normalizer;
 
 import jdk.jshell.spi.ExecutionControl.NotImplementedException;
 
@@ -12,6 +13,8 @@ public class Pergunta implements Registro
   private long criacao;
   private short nota;
   private String pergunta;
+  //o método utilizado vai ser todas as palavras chaves dividas por ponto e virgula
+  private String palavrasChave;
 
   public Pergunta()
   {
@@ -25,6 +28,22 @@ public class Pergunta implements Registro
     this.pergunta = pergunta;
     this.criacao = 0;
     this.nota = 0;
+    this.palavrasChave = "";
+  }
+
+  public Pergunta(int idPergunta, int idUsuario, String pergunta, String palavrasChave)
+  {
+    this.idPergunta = idPergunta;
+    this.idUsuario = idUsuario;
+    this.pergunta = pergunta;
+    this.criacao = 0;
+    this.nota = 0;
+
+    //Retirando os acentos.
+    this.palavrasChave = Normalizer.normalizer(palavrasChave, Normalize.Form.NFD);
+    this.palavrasChave = this.palavrasChave.replaceAll("[\\p{InCombiningDiacriticalMarks}]", "");
+
+    this.palavrasChave = palavrasChave.toLowerCase().trim();
   }
   
   public byte[] toByteArray() throws IOException
@@ -36,6 +55,7 @@ public class Pergunta implements Registro
     dos.writeLong(criacao);
     dos.writeShort(nota);
     dos.writeUTF(pergunta);
+    dos.writeUTF(palavrasChave);
     return baos.toByteArray();
   }
 
@@ -48,6 +68,7 @@ public class Pergunta implements Registro
     this.criacao = dis.readLong();
     this.nota = dis.readShort();
     this.pergunta = dis.readUTF();
+    this.palavrasChave = dis.readUTF();
   } 
 
   public int getIdPergunta() 
@@ -110,7 +131,8 @@ public class Pergunta implements Registro
   public String toString() 
   {
     return "Pergunta [criacao=" + criacao + ", idPergunta=" + idPergunta + ", idUsuario="
-        + idUsuario + ", nota=" + nota + ", pergunta=" + pergunta + "]";
+        + idUsuario + ", nota=" + nota + ", pergunta=" + pergunta + ", palavrasChave="
+        + palavrasChave "]";
   }
 
   public int getId()
@@ -121,5 +143,16 @@ public class Pergunta implements Registro
   public void setId(int id)
   {
     setIdPergunta(id);
+  }
+
+  public String getPalavrasChave(){
+    return this.palavrasChave;
+  }
+
+  public void setPalavrasChave(String palavrasChave){
+    this.palavrasChave = Normalizer.normalizer(palavrasChave, Normalize.Form.NFD);
+    this.palavrasChave = this.palavrasChave.replaceAll("[\\p{InCombiningDiacriticalMarks}]", "");
+
+    this.palavrasChave = palavrasChave.toLowerCase().trim();
   }
 }

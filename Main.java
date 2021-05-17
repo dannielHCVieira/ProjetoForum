@@ -10,6 +10,7 @@ public class Main
   private static CRUD<Pergunta, pcvPergunta> arqPerguntas;
   private static HashExtensivel<pcvEmail> hashEmail;
   private static ArvoreBMais_ChaveComposta_Int_Int arvB_P;
+  private static ListaInvertida indInver;
 
   public static int usuarioAtual;
 
@@ -23,12 +24,15 @@ public class Main
       pcvUsuario.class.getConstructor(), "dados/usuario_hash_d.db","dados/usuario_hash_c.db","dados/usuarios.db");
       arqPerguntas = new CRUD<>(Pergunta.class.getConstructor(),
       pcvPergunta.class.getDeclaredConstructor(int.class,long.class),
-      pcvPergunta.class.getConstructor(), "dados/pergunta_hash_d.db","dados/usuario_hash_c.db","dados/perguntas.db");
+      pcvPergunta.class.getConstructor(), "dados/pergunta_hash_d.db","dados/pergunta_hash_c.db","dados/perguntas.db");
       //criacao hashEmail
       hashEmail = new HashExtensivel<>(pcvEmail.class.getConstructor(), 4, "dados/email_hash_d.db", "dados/email_hash_c.db");
       //criacao arvoreB+_idUsuario_idPergunta
       arvB_P = new ArvoreBMais_ChaveComposta_Int_Int(255, "dados/arvore.db");
       Scanner sc = new Scanner(System.in);
+      //criacao indice invertido
+      indInver = new ListaInvertida(4, "dados/listainvertida_dict.db",
+                                    "dados/listainvertida_blocos.db");
       //menu principal
       sistemaUsuario(sc);
       sc.close();
@@ -145,7 +149,7 @@ public class Main
     }
   }
 
-public static void novoUsuario(Scanner sc)
+  public static void novoUsuario(Scanner sc)
   {
     try
     {
@@ -298,6 +302,7 @@ public static void novoUsuario(Scanner sc)
       }
     }
   }
+
   public static void criacaoPerguntas(Scanner sc)
   {
     int opcode = -1;
@@ -326,6 +331,7 @@ public static void novoUsuario(Scanner sc)
       }
     }
   }
+
   public static int[] listaPerguntas(Scanner sc)
   {
     int[] arrayIdPerguntas = new int[0];
@@ -356,11 +362,21 @@ public static void novoUsuario(Scanner sc)
   {
     try
     {
-      System.out.print("\nDigite a sua pergunta:");
-      String pergunta = sc.nextLine();
+      String pergunta = "";
+      do{
+        System.out.print("\nDigite a sua pergunta:");
+        pergunta = sc.nextLine();
+      }while(pergunta.length() == 0);
+
+      String palavrasChave = "";
+      do{
+        System.out.println("\nDigite as palavras-chaves da sua pergunta(ex.: galinha;atravessou;rua):");
+        palavrasChaves = sc.nextLine();
+      }while(palavrasChave.length() == 0);
 
       System.out.println("\n\nConfirme seus dados:");
-      System.out.println("Pergunta:" + pergunta);
+      System.out.println("Pergunta: " + pergunta);
+      System.out.println("Palavras-chave: " + palavrasChave);
       System.out.print("Confirmar? (Y/N) ");
       if(sc.nextLine().toUpperCase().equals("Y"))
       {
@@ -369,10 +385,12 @@ public static void novoUsuario(Scanner sc)
         question.setPergunta(pergunta);
         question.setNota((short)0); 
         question.setCriacao(); //Metodo interno já obtem a data e a hora.
-        question.setAtiva(true);   
+        question.setAtiva(true); 
+        question.setPalavrasChave(palavrasChave);  
 
         arqPerguntas.create(question);
         arvB_P.create(usuarioAtual,question.getId());
+        criarIndInver(question.getId(), palavrasChave);
         System.out.println("\nPergunta criada com sucesso.\n");
       }
       else
@@ -387,43 +405,50 @@ public static void novoUsuario(Scanner sc)
   public static void alterarPerguntas(Scanner sc)
   {
     try{
-      System.out.println("\nVeja qual pergunta voce deseja alterar, lembrando que apenas as perguntas que nao possuem repostas podem ser alteradas");
       int[] listaPerguntas = listaPerguntas(sc);
-      System.out.println("\nDigite o número da pergunta que queira alterar.");
-      System.out.println("\n0) Retornar para CRIACAO DE PERGUNTAS");
-      System.out.print("\nOpcao:");
-      int iPergunta = sc.nextInt();
-      sc.nextLine();
-      if (iPergunta != 0)
-      {
-        Pergunta pergunta = arqPerguntas.read(listaPerguntas[iPergunta-1]);
+      if(listaPerguntas.length == 0){
+        System.out.println("\nNão há perguntas para alterar.");
+      }else{
+        System.out.println("\nVeja qual pergunta voce deseja alterar, lembrando que apenas as perguntas que nao possuem repostas podem ser alteradas");
+        
+        System.out.println("\nDigite o número da pergunta que queira alterar.");
+        System.out.println("\n0) Retornar para CRIACAO DE PERGUNTAS");
+        System.out.print("\nOpcao:");
+        int iPergunta = sc.nextInt();
+        sc.nextLine();
+        if (iPergunta != 0 || iPergunta <= listaPerguntas.length)
+        {
+          Pergunta pergunta = arqPerguntas.read(listaPerguntas[iPergunta-1]);
 
-        if(pergunta.isAtiva()){
-          printPergunta(pergunta);
+          if(pergunta.isAtiva()){
+            System.out.println("\nPergunta:");
+            printPergunta(pergunta);
 
-          System.out.print("\nDigite a pergunta alterada:");
-          String perguntaAlt = sc.nextLine();
+            System.out.print("Digite a pergunta alterada:");
+            String perguntaAlt = sc.nextLine();
 
-          if(perguntaAlt.length() != 0){
-            System.out.println("\n\nConfirme seus dados:");
-            System.out.println("Pergunta:" + perguntaAlt);
-            System.out.print("Confirmar? (Y/N) ");
-            if(sc.nextLine().toUpperCase().equals("Y"))
-            {
-              pergunta.setPergunta(perguntaAlt);
+            if(perguntaAlt.length() != 0){
+              System.out.println("\nConfirme seus dados:");
+              System.out.println("Pergunta:" + perguntaAlt);
+              System.out.print("Confirmar? (Y/N) ");
+              if(sc.nextLine().toUpperCase().equals("Y"))
+              {
+                pergunta.setPergunta(perguntaAlt);
 
-              arqPerguntas.update(pergunta);
-              System.out.println("\nPergunta atualizada com sucesso.\n");
+                arqPerguntas.update(pergunta);
+                System.out.println("\nPergunta atualizada com sucesso.\n");
+              }
+              else
+                System.out.println("\nAtualização de pergunta cancelada.\n");
             }
             else
-              System.out.println("\nAtualização de pergunta cancelada.\n");
+              System.out.println("\nAtualização vazia.\n");
           }
           else
-            System.out.println("\nAtualização vazia.\n");
+            System.out.println("\nPergunta arquivada não pode ser alterada.\n");
         }
-        else
-          System.out.println("\nPergunta arquivada não pode ser alterada.\n");
       }
+      
     }catch(Exception e){
       e.printStackTrace();
     }
@@ -432,34 +457,38 @@ public static void novoUsuario(Scanner sc)
   public static void arquivamentoPerguntas(Scanner sc)
   {
     try{
-      System.out.println("\nEscolha a pergunta que vc deseja arquivar:");
       int[] listaPerguntas = listaPerguntas(sc);
-      System.out.println("\nDigite o número da pergunta que queira arquivar.");
-      System.out.println("\n0) Retornar para CRIACAO DE PERGUNTAS");
-      System.out.print("\nOpcao:");
-      int iPergunta = sc.nextInt();
-      sc.nextLine();
-      if (iPergunta != 0)
-      {
-        Pergunta pergunta = arqPerguntas.read(listaPerguntas[iPergunta-1]);
+      if(listaPerguntas.length == 0){
+        System.out.println("\nNão há perguntas para arquivar.");
+      }else{
+        System.out.println("\nEscolha a pergunta que vc deseja arquivar:");
+        System.out.println("\nDigite o número da pergunta que queira arquivar.");
+        System.out.println("\n0) Retornar para CRIACAO DE PERGUNTAS");
+        System.out.print("\nOpcao:");
+        int iPergunta = sc.nextInt();
+        sc.nextLine();
+        if (iPergunta != 0 || iPergunta <= listaPerguntas.length)
+        {
+          Pergunta pergunta = arqPerguntas.read(listaPerguntas[iPergunta-1]);
 
-        if(pergunta.isAtiva()){
-          System.out.println("\n\nConfirme seus dados:");
-          System.out.print("Pergunta: ");
-          printPergunta(pergunta);
-          System.out.print("\nConfirmar? (Y/N) ");
-          if(sc.nextLine().toUpperCase().equals("Y"))
-          {
-            pergunta.setAtiva(false);
+          if(pergunta.isAtiva()){
+            System.out.println("\n\nConfirme seus dados:");
+            System.out.print("Pergunta: ");
+            printPergunta(pergunta);
+            System.out.print("\nConfirmar? (Y/N) ");
+            if(sc.nextLine().toUpperCase().equals("Y"))
+            {
+              pergunta.setAtiva(false);
 
-            arqPerguntas.update(pergunta);
-            System.out.println("\nPergunta atualizada com sucesso.\n");
+              arqPerguntas.update(pergunta);
+              System.out.println("\nPergunta atualizada com sucesso.\n");
+            }
+            else
+              System.out.println("\nAtualização de pergunta cancelada.\n");
           }
           else
-            System.out.println("\nAtualização de pergunta cancelada.\n");
+            System.out.println("\nPergunta já arquivada.\n");
         }
-        else
-          System.out.println("\nPergunta já arquivada.\n");
       }
     }catch(Exception e){
       e.printStackTrace();
@@ -468,15 +497,22 @@ public static void novoUsuario(Scanner sc)
   
   public static void printPergunta(Pergunta p)
   {
-    if(!p.isAtiva())
+    if(p.isAtiva())
     {
-      System.out.print(" (Arquivada)");
+      System.out.print("\n");
+      Calendar calendar = Calendar.getInstance();
+      calendar.setTimeInMillis(p.getCriacao());
+      SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+      System.out.println(formatter.format(calendar.getTime()));
+      System.out.println(p.getPergunta());
+      System.out.println("Palavras-chaves: "+p.getPalavrasChave()+"\n");
     }
-    System.out.print("\n");
-    Calendar calendar = Calendar.getInstance();
-    calendar.setTimeInMillis(p.getCriacao());
-    SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
-    System.out.println(formatter.format(calendar.getTime()));
-    System.out.println(p.getPergunta()+"\n");
+  }
+
+  public static void criarIndInver(int id, String palavrasChave){
+    String[] split = palavrasChave.split(";");
+    for(int i = 0; i < split.length; i++){
+      indInver.create(split[i],id);
+    }
   }
 }
