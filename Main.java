@@ -16,7 +16,7 @@ public class Main {
   public static int usuarioAtual;
   public static int perguntaAtual;
 
-  public static void main(String[] args) {
+  public static void main(String[]args) {
     try {
       // criacao do crud
       arqPessoas = new CRUD<>(Usuario.class.getConstructor(),
@@ -67,22 +67,18 @@ public class Main {
   }
 
   public static void menuPerguntas(int notificacoes) {
-    System.out.println("\n=============");
-    System.out.println("PERGUNTAS 1.0");
-    System.out.println("=============");
-    System.out.println("\nINICIO\n");
-    System.out.println("1) Criacao/Alteracao de perguntas");
+    menuPadrao();
+    System.out.println("1) Criacao/Gerenciamento de perguntas");
     System.out.println("2) Consulta/responder perguntas");
-    System.out.println("3) Notificacoes: " + notificacoes);
+    System.out.println("3) Gerenciar suas respostas");
+    System.out.println("4) Notificacoes: " + notificacoes);
     System.out.println("\n0) Sair\n");
     System.out.print("Opcao:");
   }
 
   public static void menuCriacaoPergunta() {
-    System.out.println("\n=============");
-    System.out.println("PERGUNTAS 1.0");
-    System.out.println("=============");
-    System.out.println("\nINICIO > CRIACAO DE PERGUNTAS");
+    menuPadrao();
+    System.out.println("> CRIACAO DE PERGUNTAS");
     System.out.println("\n1) Listar");
     System.out.println("2) Incluir");
     System.out.println("3) Alterar");
@@ -93,16 +89,33 @@ public class Main {
   }
 
   public static void menuConsultaPerguntas() {
-    System.out.println("PERGUNTAS 1.0");
-    System.out.println("=============\n");
-    System.out.println("INÍCIO > PERGUNTAS\n");
+    menuPadrao();
+    System.out.println("> PERGUNTAS\n");
     System.out.println("Busque as perguntas por palavra chave separadas por ponto e vírgula");
     System.out.println("Ex: política;Brasil;eleições\n");
     System.out.print("Palavras chave: ");
   }
 
+  public static void menuRespostas() {
+    menuPadrao();
+    System.out.println("> GERENCIADOR DE RESPOSTAS");
+  }
+
+  public static void menuGerenciarRespostas() {
+    System.out.println("\n\n1)Alterar Resposta"+
+    "\n2)Arquivar Resposta"+
+    "\n\n0)Sair");
+  }
+
+  public static void menuPadrao() {
+    System.out.println("\n=============");
+    System.out.println("PERGUNTAS 1.0");
+    System.out.println("=============");
+    System.out.println("\nINICIO");
+  }
+
   // -------------------Usuarios-------------------------
-  public static void sistemaUsuario(Scanner sc) {
+  public void sistemaUsuario(Scanner sc) {
     int opcode = -1;
     do {
       menuPrincipal();
@@ -127,7 +140,7 @@ public class Main {
     } while (opcode != 0);
   }
 
-  public static void acessoSistemaUsuario(Scanner sc) {
+  public void acessoSistemaUsuario(Scanner sc) {
     try {
       System.out.println("\n=============");
       System.out.println("ACESSO AO SISTEMA");
@@ -265,7 +278,7 @@ public class Main {
   }
   // ---------------------------Perguntas------------------------
 
-  public static void sistemaPerguntas(Scanner sc) {
+  public void sistemaPerguntas(Scanner sc) throws Exception {
     int opcode = -1;
     // menu Perguntas
     while (opcode != 0) {
@@ -280,6 +293,9 @@ public class Main {
         consultaPerguntas(sc);
         break;
       case 3:
+        gerenciarRespostas(sc);
+        break;
+      case 4:
         System.out.println("\nNotificacoes sera implementado no futuro");
         break;
       case 0:
@@ -539,23 +555,8 @@ public class Main {
 
   public static void consultaPerguntas(Scanner sc) {
     try {
-      menuConsultaPerguntas();
-      String palavrasChave = sc.nextLine();
+      ArrayList<Pergunta> listaPerguntas = listaPerguntasUsuario(sc);
 
-      palavrasChave = formatarPalavrasChave(palavrasChave);
-
-      ArrayList<Pergunta> listaPerguntas = buscarPerguntas(palavrasChave);
-
-      System.out.println("\nRESULTADO DA PESQUISA:");
-      int i = 1;
-      for (Pergunta p : listaPerguntas) {
-        System.out.print(i++ + ".");
-        printPerguntaResumido(p);
-      }
-      if (listaPerguntas.size() == 0)
-        System.out.println("\nNenhuma pergunta disponivel");
-      System.out.println("\n0) Retornar para CRIACAO DE PERGUNTAS");
-      System.out.println("\nDigite o número da pergunta que queira visualizar.");
       int iPergunta = sc.nextInt();
       sc.nextLine();
       if (iPergunta != 0) {
@@ -565,6 +566,11 @@ public class Main {
         perguntaAtual = perguntaSelecionada.getId();
 
         listarTodasRespostas(sc);
+        System.out.println(
+        "1) Responder\n"+
+        "2) Avaliar\n\n"+
+        "0) Retornar");
+        System.out.print("Opção: ");  
 
         int opcode = sc.nextInt();
         sc.nextLine();
@@ -575,9 +581,6 @@ public class Main {
         case 1:
           incluirResposta(sc);
           break;
-        case 3:
-          gerenciarRespostas(sc);
-          break;
         default:
           System.out.println("\nEm breve...");
         }
@@ -587,6 +590,26 @@ public class Main {
     } catch (Exception e) {
       e.printStackTrace();
     }
+  }
+
+  public static ArrayList<Pergunta> listaPerguntasUsuario(Scanner sc) {
+    menuConsultaPerguntas();
+    String palavrasChave = sc.nextLine();
+
+    palavrasChave = formatarPalavrasChave(palavrasChave);
+    ArrayList<Pergunta> listaPerguntas = buscarPerguntas(palavrasChave);
+
+    System.out.println("\nRESULTADO DA PESQUISA:");
+    int i = 1;
+    for (Pergunta p : listaPerguntas) {
+      System.out.print(i++ + ".");
+      printPerguntaResumido(p);
+    }
+    if (listaPerguntas.size() == 0)
+      System.out.println("\nNenhuma pergunta disponivel");
+    System.out.println("\n0) Retornar para CRIACAO DE PERGUNTAS");
+    System.out.println("\nDigite o número da pergunta que queira visualizar.");
+    return listaPerguntas;
   }
 
   public static ArrayList<Pergunta> buscarPerguntas(String palavrasChave) {
@@ -658,6 +681,106 @@ public class Main {
     }
   }
 
+  public static void AlterarRespostas(Scanner sc, Resposta r) {
+    if (r.isAtiva()) {
+      String respostaAlt;
+      do {
+        System.out.print("Digite a resposta alterada:");
+        respostaAlt = sc.nextLine();
+      } while (respostaAlt.length() == 0);
+
+      if (respostaAlt.length() != 0) {
+        System.out.println("\nConfirme seus dados:");
+        System.out.println("resposta: " + respostaAlt);
+        System.out.print("Confirmar? (Y/N) ");
+        if (sc.nextLine().toUpperCase().equals("Y")) {
+          r.setresposta(respostaAlt);
+
+          arqrespostas.update(resposta);
+          System.out.println("\nresposta atualizada com sucesso.\n");
+        } else
+          System.out.println("\nAtualização de resposta cancelada.\n");
+      } else
+        System.out.println("\nAtualização vazia.\n");
+    } else
+      System.out.println("\nresposta arquivada não pode ser alterada.\n");
+  }
+
+  public static void ArquivarResposta(Scanner sc, Resposta r) {
+    System.out.println("\n\nConfirme seus dados:"); 
+    System.out.print("resposta:"); 
+    printResposta(r); 
+    System.out.print("\nConfirmar? (Y/N) ");
+
+    if(sc.nextLine().toUpperCase().equals("Y")) 
+    {
+      r.setAtiva(false);
+
+      arqRespostas.update(r); 
+      System.out.println("\nresposta arquivada com sucesso.\n"); 
+    } 
+    else 
+      System.out.println("\nArquivamento de resposta cancelada.\n"); 
+  }
+
+  public void gerenciarRespostas(Scanner sc) throws Exception{
+    menuRespostas();
+    //Procurar respostas do usuario
+    int[] idRespostasUser = this.arvB_UsuarioResposta.read(this.usuarioAtual);
+    Pergunta[] PerguntasRespondidasUser = new Pergunta[idRespostasUser.length+1];
+    Resposta[] RespostasUser = new Resposta[idRespostasUser.length+1];
+    for (int i = 1;i < PerguntasRespondidasUser.length+1;i++){
+      //Pegar respostas do user
+      RespostasUser[i] = this.arqRespostas.read(idRespostasUser[i-1]);
+      //Pegar perguntas respondidas
+      PerguntasRespondidasUser[i] = this.arqPerguntas.read(RespostasUser[i].getIdPergunta());
+      System.out.println("-----"+i+". Pergunta-----");
+      printPergunta(PerguntasRespondidasUser[i]);
+      System.out.println("\n------- Resposta -------");
+      printResposta(RespostasUser[i]);
+    }
+    System.out.print("\n\n0)Retornar para o INICIO"+
+    "\nEscolha uma das respostas a cima para gerenciar"+
+    "\nopcao:");
+    int opcao = 0;
+    do{
+      opcao = sc.nextInt();
+      if (opcao != 0 && opcao < PerguntasRespondidasUser.length)
+      {
+        menuRespostas();
+        System.out.println("\n\n-----"+opcao+". Pergunta-----");
+        printPergunta(PerguntasRespondidasUser[opcao]);
+        System.out.println("\n------- Resposta -------");
+        printResposta(RespostasUser[opcao]);
+        
+        menuGerenciarRespostas();
+        System.out.println("Opcao:");
+        int opcaoGerenciarResposta = 0;
+        do{
+          opcaoGerenciarResposta = sc.nextInt();
+          switch (opcaoGerenciarResposta){
+            case 0: 
+              System.out.println("Voltando ao Gerenciador de Respostas...");
+              break;
+            case 1:
+              AlterarRespostas(sc, RespostasUser[opcaoGerenciarResposta]);
+              break;
+            case 2:
+              ArquivarResposta(sc, RespostasUser[opcaoGerenciarResposta]);
+              break;
+            default:
+              System.out.println("Valor invalido, digite novamente");
+          }
+        }while(opcaoGerenciarResposta != 0);
+      }
+      else if(opcao != 0)
+      {
+        System.out.println("Valor invalido digite novamente");
+      }
+    }while(opcao != 0);
+    System.out.println("\n\nVoltando ao INICIO...");
+  }
+
   public static int[] listarTodasRespostas(Scanner sc){
     int[] arrayIdRespostas = new int[0];
     int[] arrayIdRespostasSelecionadas = new int[0];
@@ -674,38 +797,7 @@ public class Main {
         }
       }
       if (arrayIdRespostas.length == 0)
-        System.out.println("\nNenhuma resposta disponivel");
-
-      System.out.println("1) Responder\n2) Avaliar\n3) Gerenciar Respostas\n\n0) Retornar");
-      System.out.print("Opção: ");           
-    }
-    catch(Exception e){
-      e.printStackTrace();
-    }
-    return arrayIdRespostasSelecionadas;
-  }
-
-  public static void gerenciarRespostas(Scanner sc){
-    
-  }
-
-  public static int[] listarRespostas(Scanner sc){
-    int[] arrayIdRespostas = new int[0];
-    int[] arrayIdRespostasSelecionadas = new int[0];
-    try{
-      arrayIdRespostas = arvB_PerguntaResposta.read(perguntaAtual);
-
-      Resposta r;
-      for (int i = 0; i < arrayIdRespostas.length; i++) {
-        r = arqRespostas.read(arrayIdRespostas[i]);
-        if (r.isAtiva() && r.getIdUsuario() == usuarioAtual) {
-          arrayIdRespostasSelecionadas = VetorIntVariavel(arrayIdRespostas, arrayIdRespostas[i]);
-          System.out.println(i + 1 + ".");
-          printResposta(r);
-        }
-      }
-      if (arrayIdRespostas.length == 0)
-        System.out.println("\nNenhuma resposta disponivel");
+        System.out.println("\nNenhuma resposta disponivel");         
     }
     catch(Exception e){
       e.printStackTrace();
@@ -784,9 +876,8 @@ public class Main {
   }
 
   public static void printPerguntaExibida(Pergunta p) throws Exception {
-    System.out.println("PERGUNTAS 1.0");
-    System.out.println("=============\n");
-    System.out.println("INÍCIO > PERGUNTAS\n");
+    menuPadrao();
+    System.out.println("PERGUNTAS\n");
     System.out.println("+---------------------------------------------------------------------+");
     System.out.println(p.getPergunta());
     System.out.println("+---------------------------------------------------------------------+");
@@ -801,10 +892,6 @@ public class Main {
 
     System.out.println("RESPOSTAS");
     System.out.println("---------\n");
-  }
-
-  public static void printRespostas(Pergunta p){
-    
   }
 
   public static void printResposta(Resposta r) throws Exception{
